@@ -8,24 +8,28 @@ const sequelize = new Sequelize('car_store_db', 'root', process.env['MYSQL_PASSW
    }
 });
 
-module.exports = sequelize.define('user', {
+module.exports = sequelize.define('product', {
    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
       autoIncrement: true,
       allowNull: false,
    },
-   email: {
+   name: {
       type: Sequelize.STRING,
       allowNull: false,
       unique: true,
-   },                            // can use validate: {isEmail: true}
-   password: {
+   },
+   country: {
       type: Sequelize.STRING,
       allowNull: false,
    },
-   account: {
+   price: {
       type: Sequelize.INTEGER,
       allowNull: false,
-   }
-});
+   },
+   category: {
+      type: Sequelize.STRING,
+      allowNull: false,
+   },
+})
