@@ -5,9 +5,17 @@ const userApiController = require('../controllers/userApiController');
 
 userApiRouter.post('/', userApiController.create);
 
-userApiRouter.post('/account/add', userApiController.accountAdd);
+userApiRouter.post('/account', userApiController.addAccount);
 
-userApiRouter.post('/account/remove', userApiController.accountRemove);
+userApiRouter.delete('/account', userApiController.removeAccount);
+
+userApiRouter.post('/order/product', userApiController.addProductToOrder);
+
+userApiRouter.delete('/order/product', userApiController.removeProductFromOrder);
+
+userApiRouter.delete('/order', userApiController.removeOrder);
+
+userApiRouter.post('/order', userApiController.completeOrder);
 
 
 module.exports = userApiRouter;

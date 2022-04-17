@@ -8,7 +8,7 @@ const sequelize = new Sequelize('car_store_db', 'root', process.env['MYSQL_PASSW
    }
 });
 
-module.exports = sequelize.define('product', {
+module.exports = sequelize.define('category', {
    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
@@ -20,16 +20,4 @@ module.exports = sequelize.define('product', {
       allowNull: false,
       unique: true,
    },
-   country: {
-      type: Sequelize.STRING,
-      allowNull: false,
-   },
-   price: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-   },
-   category: {
-      type: Sequelize.STRING,
-      allowNull: false,
-   },
-})
+});

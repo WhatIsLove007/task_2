@@ -1,20 +1,26 @@
-const Car = require('../models/products/Car')
+const Product = require('../models/Product');
+const Category = require('../models/Category');
+const fieldsValidation = require('../models/business-logic/fieldsValidation')
 
-module.exports.addCar = async (request, response) => {
+module.exports.add = async (request, response) => {
 
-   const {name, country, category} = request.body;
+   const {name, description, categoryId} = request.body;
    const price = parseInt(request.body.price);
 
-   if (!name || !country || !price || !category) {
+   try {
+      fieldsValidation.validateFields([name, description, categoryId, price]);
+   } catch (error) {    // ! not normal or normal ?
       return response.status(400).send({message: 'No data in request body'});
    }
 
    try {
-      const existingProduct = await Car.findOne({where: {name}});
+      const existingProduct = await Product.findOne({where: {name}});
+      if (existingProduct) return response.status(409).send({message: 'Product already exists'});
 
-      if (existingProduct) return response.status(409).send({message: 'Product exists'});
+      const existingCategory = await Category.findOne({where: {id: categoryId}});
+      if (!existingCategory) return response.status(404).send({message: 'Category does not exist'});
 
-      await Car.create({name, country, price, category});
+      await Product.create({name, description, category_id: categoryId, price});
 
       response.sendStatus(200);
       
@@ -26,14 +32,19 @@ module.exports.addCar = async (request, response) => {
 }
 
 
-module.exports.removeCar = async (request, response) => {
+module.exports.remove = async (request, response) => {
 
-   const { productName } = request.query;
-   if (!productName) return response.status(400).send({message: 'No data in request body'})
+   const { id } = request.query;
 
    try {
-      const existingProduct = await Car.destroy({where: {name: productName}});
-      if (!existingProduct) return response.status(404).send({message: 'Product doen not exist'});
+      fieldsValidation.validateFields([id]);
+   } catch (error) {    // ! not normal or ...?
+      return response.status(400).send({message: 'No data in request body'});
+   }
+
+   try {
+      const existingProduct = await Product.destroy({where: {id}});
+      if (!existingProduct) return response.status(404).send({message: 'Product does not exist'});
       response.sendStatus(200);
       
    } catch (error) {

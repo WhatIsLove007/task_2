@@ -3,9 +3,9 @@ const productApiRouter = express.Router();
 const productApiController = require('../controllers/productApiController');
 
 
-productApiRouter.post('/car', productApiController.addCar);
+productApiRouter.post('/', productApiController.add);
 
-productApiRouter.delete('/car', productApiController.removeCar);
+productApiRouter.delete('/', productApiController.remove);
 
 
 module.exports = productApiRouter;
