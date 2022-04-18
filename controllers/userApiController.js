@@ -31,8 +31,7 @@ module.exports.createUser = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 }
 
@@ -50,8 +49,7 @@ module.exports.addAccount = async (request, response) => {
       await User.update({account: user.account + amountOfMoney}, {where: {email}});
       response.sendStatus(200);
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 
 }
@@ -77,8 +75,7 @@ module.exports.removeAccount = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 
 }
@@ -141,8 +138,8 @@ module.exports.addProductToOrder = async (request, response) => {
       return response.sendStatus(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
+
    }
 
 }
@@ -173,8 +170,7 @@ module.exports.removeProductFromOrder = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 
 }
@@ -200,8 +196,7 @@ module.exports.removeOrder = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 
    
@@ -246,8 +241,7 @@ module.exports.completeOrder = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 
 }
@@ -272,9 +266,7 @@ module.exports.getUser = async (request, response) => {
       });
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
-      
+      errorHandler.handle(error, response);      
    }
 }
 
@@ -293,9 +285,7 @@ module.exports.deleteUser = async (request, response) => {
       return response.sendStatus(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
-
+      errorHandler.handle(error, response);
    }
 }
 
@@ -318,8 +308,6 @@ module.exports.updateUser = async (request, response) => {
       return response.sendStatus(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
-
+      errorHandler.handle(error, response);
    }
 }

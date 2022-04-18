@@ -1,11 +1,12 @@
-module.exports.handle = error => {
+module.exports.handle = (error, response) => {
 
    switch (error.message) {
       case 'No data in request body':
-         return {status: 400, message: error.message};
+         response.status(400).send({message: error.message});
+         break;
       default:
          console.log(error);
-         return {status: 400, message: 'Server error'};
+         response.status(500).send({message: 'Server error'});
    }
 
 }

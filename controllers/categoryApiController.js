@@ -17,8 +17,7 @@ module.exports.add = async (request, response) => {
       response.sendStatus(200);
       
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 
 }
@@ -39,8 +38,7 @@ module.exports.remove = async (request, response) => {
       response.sendStatus(200);
       
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 
 }
@@ -60,8 +58,7 @@ module.exports.get = async (request, response) => {
       return response.status(200).send(category);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
 
 }
@@ -83,9 +80,7 @@ module.exports.update = async (request, response) => {
       return response.status(200);
 
    } catch (error) {
-      const handledError = errorHandler.handle(error);
-      return response.status(handledError.status).send({message: handledError.message});
+      errorHandler.handle(error, response);
    }
-
 
 }

@@ -7,5 +7,9 @@ productApiRouter.post('/', productApiController.add);
 
 productApiRouter.delete('/', productApiController.remove);
 
+productApiRouter.get('/', productApiController.get);
+
+productApiRouter.get('/all', productApiController.getAll);
+
 
 module.exports = productApiRouter;
