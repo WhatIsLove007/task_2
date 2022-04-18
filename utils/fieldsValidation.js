@@ -1,4 +1,4 @@
-module.exports.validateFields = (fields, response) => {
+module.exports.validateFields = (fields) => {
 
       fields?.forEach(field => {
          if (!field) {

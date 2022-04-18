@@ -4,28 +4,25 @@ const OrderProduct = require('../models/OrderProduct');
 const Product = require('../models/Product');
 const entryDataValidation = require('../utils/entryDataValidation');
 const passwordHashing = require('../utils/passwordHashing');
-const fieldsValidation = require('../utils/fieldsValidation')
+const fieldsValidation = require('../utils/fieldsValidation');
+const errorHandler = require('../utils/errorHandler');
 
 
-module.exports.create = async (request, response) => {
+module.exports.createUser = async (request, response) => {
    
    const {email, password} = request.body;
 
    try {
       fieldsValidation.validateFields([email, password]);
-   } catch (error) {    // ! not normal
-      return response.status(400).send({message: 'No data in request body'});
-   }
 
-   if (!entryDataValidation.validateEmail(email)) {
-      return response.status(400).send({message: 'Incorrect email'});
-   }
-
-   if (!entryDataValidation.validatePassword(password)) {
-      return response.status(400).send({message: 'Incorrect password'});
-   }
-
-   try {
+      if (!entryDataValidation.validateEmail(email)) {
+         return response.status(400).send({message: 'Incorrect email'});
+      }
+   
+      if (!entryDataValidation.validatePassword(password)) {
+         return response.status(400).send({message: 'Incorrect password'});
+      }
+   
       const user = await User.findOne({where: {email}});
       if (user) return response.status(401).send({message: 'Email already exist'});
 
@@ -34,8 +31,8 @@ module.exports.create = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
 }
 
@@ -47,18 +44,14 @@ module.exports.addAccount = async (request, response) => {
 
    try {
       fieldsValidation.validateFields([email, amountOfMoney]);
-   } catch (error) {    // ! not normal
-      return response.status(400).send({message: 'No data in request body'});
-   }
 
-   try {
       const user = await User.findOne({where: {email}});
       if (!user) return response.status(403).send({message: 'Email does not exist'});
       await User.update({account: user.account + amountOfMoney}, {where: {email}});
       response.sendStatus(200);
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
 
 }
@@ -71,11 +64,7 @@ module.exports.removeAccount = async (request, response) => {
 
    try {
       fieldsValidation.validateFields([email, amountOfMoney]);
-   } catch (error) {    // ! not normal
-      return response.status(400).send({message: 'No data in request body'});
-   }
 
-   try {
       const user = await User.findOne({where: {email}});
       if (!user) return response.status(403).send({message: 'Email does not exist'});
 
@@ -88,8 +77,8 @@ module.exports.removeAccount = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
 
 }
@@ -100,13 +89,9 @@ module.exports.addProductToOrder = async (request, response) => {
    const {userEmail, productId} = request.body;
    const productQuantity = parseInt(request.body.productQuantity);
 
-   try {
-      fieldsValidation.validateFields([userEmail, productId, productQuantity]);
-   } catch (error) {    // ! not normal
-      return response.status(400).send({message: 'No data in request body'});
-   }
 
    try {
+      fieldsValidation.validateFields([userEmail, productId, productQuantity]);
       
       const product = await Product.findOne({where: {id: productId}});
       if (!product) return response.status(404).send({message: 'Product does not exist'});
@@ -156,8 +141,8 @@ module.exports.addProductToOrder = async (request, response) => {
       return response.sendStatus(200);
 
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
 
 }
@@ -167,13 +152,9 @@ module.exports.removeProductFromOrder = async (request, response) => {
 
    const {userId, productId} = request.query;
 
-   try {
-      fieldsValidation.validateFields([userId, productId]);
-   } catch (error) {
-      return response.status(400).send({message: 'No data in request body'});
-   }
    
    try {
+      fieldsValidation.validateFields([userId, productId]);
 
       const product = await Product.findOne({where: {id: productId}});
       if (!product) return response.status(404).send({message: 'Product does not exist'});
@@ -192,9 +173,8 @@ module.exports.removeProductFromOrder = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
-
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
 
 }
@@ -203,14 +183,9 @@ module.exports.removeProductFromOrder = async (request, response) => {
 module.exports.removeOrder = async (request, response) => {
 
    const userId = request.query.userId;
-
-   try {
-      fieldsValidation.validateFields([userId]);
-   } catch (error) {
-      return response.status(400).send({message: 'No data in request body'});
-   }
  
    try {
+      fieldsValidation.validateFields([userId]);
 
       const user = await User.findOne({where: {id: userId}});
       if (!user) return response.status(401).send({message: 'User does not exist'});
@@ -225,9 +200,8 @@ module.exports.removeOrder = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
-
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
 
    
@@ -240,11 +214,6 @@ module.exports.completeOrder = async (request, response) => {
 
    try {
       fieldsValidation.validateFields([userId]);
-   } catch (error) {
-      return response.status(400).send({message: 'No data in request body'});
-   }
-
-   try {
 
       const user = await User.findOne({where: {id: userId}});
       if (!user) return response.status(401).send({message: 'User does not exist'});
@@ -277,9 +246,80 @@ module.exports.completeOrder = async (request, response) => {
       response.sendStatus(200);
 
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
 
+}
 
+
+module.exports.getUser = async (request, response) => {
+
+   const id = request.query.id;
+
+   try {
+
+      fieldsValidation.validateFields([id]);
+
+      const user = await User.findOne({where: {id}});
+      if (!user) return response.status(404).send({message: 'User does not exist'});
+
+      return response.send({
+         id: user.id,
+         email: user.email,
+         account: user.account,
+         createdAt: user.createdAt,
+      });
+
+   } catch (error) {
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
+      
+   }
+}
+
+module.exports.deleteUser = async (request, response) => {
+
+   const id = request.query.id;
+
+   try {
+      fieldsValidation.validateFields([id]);
+
+      const user = await User.findOne({where: {id}});
+      if (!user) return response.status(404).send({message: 'User does not exist'});
+
+      await User.destroy({where: {id}});
+
+      return response.sendStatus(200);
+
+   } catch (error) {
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
+
+   }
+}
+
+module.exports.updateUser = async (request, response) => {
+
+   const {id, newEmail} = request.body;
+
+   try {
+      fieldsValidation.validateFields([id, newEmail]);
+
+      if (!entryDataValidation.validateEmail(newEmail)) {
+         return response.status(400).send({message: 'Incorrect email'});
+      }
+
+      const user = await User.findOne({where: {id}});
+      if (!user) return response.status(404).send({message: 'User does not exist'});
+
+      await User.update({email: newEmail}, {where: {id}});
+
+      return response.sendStatus(200);
+
+   } catch (error) {
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
+
+   }
 }

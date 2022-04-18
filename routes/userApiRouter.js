@@ -3,7 +3,13 @@ const userApiRouter = express.Router();
 const userApiController = require('../controllers/userApiController');
 
 
-userApiRouter.post('/', userApiController.create);
+userApiRouter.post('/', userApiController.createUser);
+
+userApiRouter.get('/', userApiController.getUser);
+
+userApiRouter.delete('/', userApiController.deleteUser);
+
+userApiRouter.put('/', userApiController.updateUser);
 
 userApiRouter.post('/account', userApiController.addAccount);
 
