@@ -1,6 +1,6 @@
 const Product = require('../models/Product');
 const Category = require('../models/Category');
-const fieldsValidation = require('../models/business-logic/fieldsValidation')
+const fieldsValidation = require('../utils/fieldsValidation');
 
 module.exports.add = async (request, response) => {
 

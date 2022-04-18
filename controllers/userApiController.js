@@ -2,9 +2,9 @@ const User = require('../models/User');
 const Order = require('../models/Order');
 const OrderProduct = require('../models/OrderProduct');
 const Product = require('../models/Product');
-const entryDataValidation = require('../models/business-logic/entryDataValidation');
-const passwordHashing = require('../models/business-logic/passwordHashing');
-const fieldsValidation = require('../models/business-logic/fieldsValidation')
+const entryDataValidation = require('../utils/entryDataValidation');
+const passwordHashing = require('../utils/passwordHashing');
+const fieldsValidation = require('../utils/fieldsValidation')
 
 
 module.exports.create = async (request, response) => {
@@ -29,7 +29,7 @@ module.exports.create = async (request, response) => {
       const user = await User.findOne({where: {email}});
       if (user) return response.status(401).send({message: 'Email already exist'});
 
-      await User.create({email, password: await passwordHashing.hash(password), account: 0});
+      await User.create({email, password: await passwordHashing.hash(password)});
 
       response.sendStatus(200);
 

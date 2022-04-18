@@ -7,5 +7,9 @@ categoryApiRouter.post('/', categoryApiController.add);
 
 categoryApiRouter.delete('/', categoryApiController.remove);
 
+categoryApiRouter.get('/', categoryApiController.get);
+
+categoryApiRouter.put('/', categoryApiController.update);
+
 
 module.exports = categoryApiRouter;

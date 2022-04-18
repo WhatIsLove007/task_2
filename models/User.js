@@ -1,15 +1,5 @@
 const Sequelize = require('sequelize').Sequelize;
-
-const sequelize = new Sequelize('car_store_db', 'root', process.env['MYSQL_PASSWORD'], {
-   dialect: 'mysql',
-   dialectOptions: {
-      decimalNumbers: true
-   },
-   host: 'localhost',
-   define: {
-      timestamps: false,
-   }
-});
+const sequelize = require('../models/sequelize');
 
 module.exports = sequelize.define('user', {
    id: {
@@ -30,5 +20,6 @@ module.exports = sequelize.define('user', {
    account: {
       type: Sequelize.DECIMAL(11, 2),
       allowNull: false,
+      defaultValue: 0,
    }
 });

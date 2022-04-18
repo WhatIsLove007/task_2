@@ -1,17 +1,15 @@
 const Category = require('../models/Category');
-const fieldsValidation = require('../models/business-logic/fieldsValidation')
+const fieldsValidation = require('../utils/fieldsValidation');
+const errorHandler = require('../utils/errorHandler');
 
 module.exports.add = async (request, response) => {
 
    const name = request.body.name;
 
    try {
-      fieldsValidation.validateFields([name]);
-   } catch (error) {    // ! not normal
-      return response.status(400).send({message: 'No data in request body'});
-   }
 
-   try {
+      fieldsValidation.validateFields([name]);
+
       const existingCategory = await Category.findOne({where: {name}});
       if (existingCategory) return response.status(409).send({message: 'Category already exists'});
 
@@ -19,8 +17,8 @@ module.exports.add = async (request, response) => {
       response.sendStatus(200);
       
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
 
 }
@@ -28,24 +26,66 @@ module.exports.add = async (request, response) => {
 
 module.exports.remove = async (request, response) => {
 
-   const id = request.body.id;
+   const id = request.query.id;
 
    try {
+
       fieldsValidation.validateFields([id]);
-   } catch (error) {    // ! is it normal or i tak soydet ?
-      return response.status(400).send({message: 'No data in request body'});
-   }
 
-   try {
       const existingCategory = await Category.findOne({where: {id}});
-      if (!existingCategory) return response.status(409).send({message: 'Category does not exist'});
+      if (!existingCategory) return response.status(404).send({message: 'Category does not exist'});
 
       await Category.destroy({where: {id}});
       response.sendStatus(200);
       
    } catch (error) {
-      console.log(error);
-      response.status(500).send({message: 'Server error'});
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
    }
+
+}
+
+
+module.exports.get = async (request, response) => {
+
+   const id = request.query.id;
+
+   try {
+
+      fieldsValidation.validateFields([id]);
+
+      const category = await Category.findOne({where: {id}});
+      if (!category) return response.status(404).send({message: 'Category does not exist'});
+
+      return response.status(200).send(category);
+
+   } catch (error) {
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
+   }
+
+}
+
+
+module.exports.update = async (request, response) => {
+
+   const {id, newName} = request.body;
+
+   try {
+
+      fieldsValidation.validateFields([id, newName]);
+
+      const category = await Category.findOne({where: {id}});
+      if (!category) return response.status(404).send({message: 'Category does not exist'});
+
+      await Category.update({name: newName}, {where: {id}});
+
+      return response.status(200);
+
+   } catch (error) {
+      const handledError = errorHandler.handle(error);
+      return response.status(handledError.status).send({message: handledError.message});
+   }
+
 
 }

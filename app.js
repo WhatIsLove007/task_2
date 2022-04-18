@@ -23,7 +23,7 @@ app.use('/api/category', categoryApiRouter);
 
 
 
-// sequelize.sync()
+// sequelize.sync({force: true})
 //    .then(() => {
 //       app.listen(PORT, () => console.log(`Server has been started on PORT ${PORT}...`));
 //    })

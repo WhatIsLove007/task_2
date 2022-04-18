@@ -1,12 +1,5 @@
 const Sequelize = require('sequelize').Sequelize;
-
-const sequelize = new Sequelize('car_store_db', 'root', process.env['MYSQL_PASSWORD'], {
-   dialect: 'mysql',
-   host: 'localhost',
-   define: {
-      timestamps: false,
-   }
-});
+const sequelize = require('../models/sequelize');
 
 module.exports = sequelize.define('order', {
    id: {
