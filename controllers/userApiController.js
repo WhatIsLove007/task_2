@@ -208,7 +208,6 @@ module.exports.removeOrder = async (request, response) => {
       fieldsValidation.validateFields([userId]);
    } catch (error) {
       return response.status(400).send({message: 'No data in request body'});
-      
    }
  
    try {
@@ -235,6 +234,52 @@ module.exports.removeOrder = async (request, response) => {
 }
 
 
-module.exports.completeOrder = async (request, response) => {  // next in line
+module.exports.completeOrder = async (request, response) => {
+
+   const userId = request.body.userId;
+
+   try {
+      fieldsValidation.validateFields([userId]);
+   } catch (error) {
+      return response.status(400).send({message: 'No data in request body'});
+   }
+
+   try {
+
+      const user = await User.findOne({where: {id: userId}});
+      if (!user) return response.status(401).send({message: 'User does not exist'});
+
+      const order = await Order.findOne({where: {user_id: user.id}});
+      if (!order) return response.status(404).send({message: 'Order does not exist'});
+      
+      const orderProducts = await OrderProduct.findAll({where: {order_id: order.id}});
+      if (orderProducts[0] === undefined) return response.status(404).send({message: 'No products in order'});
+
+      let purchasePrice = 0;
+
+      for (let i = 0; i < orderProducts.length; i++) {
+
+         const product = await Product.findOne({where: {id: orderProducts[i].product_id}});
+         if (!product) {
+            return response.status(404).send({message: `Product ID ${orderProducts[i].product_id} does not exist`});
+         }
+         console.log(product.price, orderProducts[i].quantity);
+         purchasePrice += product.price * orderProducts[i].quantity;
+      }
+
+      const resultedAccount = user.account - purchasePrice;
+      if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'});
+
+      await User.update({account: resultedAccount}, {where: {id: user.id}});
+      await OrderProduct.destroy({where: {order_id: order.id}});
+      await Order.destroy({where: {user_id: user.id}});
+
+      response.sendStatus(200);
+
+   } catch (error) {
+      console.log(error);
+      response.status(500).send({message: 'Server error'});
+   }
+
 
 }
