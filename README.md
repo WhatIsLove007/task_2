@@ -1,16 +1,8 @@
 # **Task_2**
 ---
-#
 ## 📑 Database structure:
-#
-![Image text](https://i.imgur.com/8i1pRgj.png)
-#
-#
-#
-#
-#
-#
-#
+![Image text](https://i.imgur.com/O2tqxJ3.png)
+___
 ```sh
 Have a nice day, Eugene ! ✨✨✨
 ```

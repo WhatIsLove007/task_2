@@ -12,17 +12,14 @@ module.exports = sequelize.define('order_product', {
    user_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      unique: true,
    },
    order_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      unique: true,
    },
    product_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      unique: true,
    },
    quantity: {
       type: Sequelize.INTEGER,

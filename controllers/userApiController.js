@@ -6,6 +6,7 @@ const entryDataValidation = require('../models/business-logic/entryDataValidatio
 const passwordHashing = require('../models/business-logic/passwordHashing');
 const fieldsValidation = require('../models/business-logic/fieldsValidation')
 
+
 module.exports.create = async (request, response) => {
    
    const {email, password} = request.body;
@@ -199,7 +200,37 @@ module.exports.removeProductFromOrder = async (request, response) => {
 }
 
 
-module.exports.removeOrder = async (request, response) => {  // next in line
+module.exports.removeOrder = async (request, response) => {
+
+   const userId = request.query.userId;
+
+   try {
+      fieldsValidation.validateFields([userId]);
+   } catch (error) {
+      return response.status(400).send({message: 'No data in request body'});
+      
+   }
+ 
+   try {
+
+      const user = await User.findOne({where: {id: userId}});
+      if (!user) return response.status(401).send({message: 'User does not exist'});
+
+      const order = await Order.findOne({where: {user_id: user.id}});
+      if (!order) return response.status(404).send({message: 'Order does not exist'});
+
+      await OrderProduct.destroy({where: {order_id: order.id}});
+
+      await Order.destroy({where: {user_id: user.id}});
+
+      response.sendStatus(200);
+
+   } catch (error) {
+      console.log(error);
+      response.status(500).send({message: 'Server error'});
+
+   }
+
    
 }
 
