@@ -14,10 +14,10 @@ module.exports.add = async (request, response) => {
       const existingProduct = await Product.findOne({where: {name}});
       if (existingProduct) return response.status(409).send({message: 'Product already exists'});
 
-      const existingCategory = await Category.findOne({where: {id: categoryId}});
-      if (!existingCategory) return response.status(404).send({message: 'Category does not exist'});
+      const category = await Category.findOne({where: {id: categoryId}});
+      if (!category) return response.status(404).send({message: 'Category does not exist'});
 
-      await Product.create({name, description, category_id: categoryId, price});
+      await category.createProduct({name, description, category_id: categoryId, price});
 
       response.sendStatus(200);
       

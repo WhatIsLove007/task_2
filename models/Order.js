@@ -13,4 +13,4 @@ module.exports = sequelize.define('order', {
       allowNull: false,
       unique: true,
    },
-})
+});

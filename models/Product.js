@@ -17,10 +17,6 @@ module.exports = sequelize.define('product', {
       type: Sequelize.TEXT,
       allowNull: false,
    },
-   category_id: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-   },
    price: {
       type: Sequelize.DECIMAL(10, 2),
       allowNull: false,

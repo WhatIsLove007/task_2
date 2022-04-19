@@ -89,11 +89,34 @@ module.exports.update = async (request, response) => {
 module.exports.getAll = async (request, response) => {
    try {
       const categories = await Category.findAll();
-      if (!categories.length) return response.status(404).send({message: 'No category'});
+      if (!categories.length) return response.status(404).send({message: 'No categories'});
 
       response.send(categories);
 
    } catch (error) {
       errorHandler.handle(error, response);
    }
+}
+
+
+module.exports.getProductsInCategory = async (request, response) => {
+   
+   const categoryId = request.query.categoryId;
+
+   try {
+      fieldsValidation.validateFields([categoryId]);
+
+      const category = await Category.findOne({where: {id: categoryId}});
+      if (!category) return response.status(404).send({message: 'Category does not exist'});
+
+      const products = await category.getProducts();
+      if (!products.length) return response.status(404).send({message: 'No products in category'});
+      
+      response.send(products);
+
+
+   } catch (error) {
+      errorHandler.handle(error, response);
+   }
+
 }

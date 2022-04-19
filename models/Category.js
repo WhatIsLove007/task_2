@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize').Sequelize;
 const sequelize = require('../models/sequelize');
+const Product = require('../models/Product');
 
-module.exports = sequelize.define('category', {
+const Category = sequelize.define('category', {
    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
@@ -14,3 +15,7 @@ module.exports = sequelize.define('category', {
       unique: true,
    },
 });
+
+Category.hasMany(Product);
+
+module.exports = Category;
