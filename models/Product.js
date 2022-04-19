@@ -1,7 +1,8 @@
 const Sequelize = require('sequelize').Sequelize;
 const sequelize = require('../models/sequelize');
+const OrderProduct = require('../models/OrderProduct');
 
-module.exports = sequelize.define('product', {
+const Product = sequelize.define('product', {
    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
@@ -22,3 +23,7 @@ module.exports = sequelize.define('product', {
       allowNull: false,
    },
 });
+
+Product.hasMany(OrderProduct, {onDelete: 'cascade'});
+
+module.exports = Product;

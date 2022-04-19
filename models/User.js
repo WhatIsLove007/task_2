@@ -1,7 +1,10 @@
 const Sequelize = require('sequelize').Sequelize;
 const sequelize = require('../models/sequelize');
+const Order = require('../models/Order');
+const OrderProduct = require('../models/OrderProduct');
 
-module.exports = sequelize.define('user', {
+
+const User = sequelize.define('user', {
    id: {
       type: Sequelize.INTEGER,
       primaryKey: true,
@@ -23,3 +26,9 @@ module.exports = sequelize.define('user', {
       defaultValue: 0,
    }
 });
+
+User.hasOne(Order, {onDelete: 'cascade'});
+
+User.hasMany(OrderProduct);
+
+module.exports = User;

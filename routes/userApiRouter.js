@@ -11,9 +11,9 @@ userApiRouter.delete('/', userApiController.deleteUser);
 
 userApiRouter.put('/', userApiController.updateUser);
 
-userApiRouter.post('/account', userApiController.addAccount);
+userApiRouter.post('/account', userApiController.addMoneyToAccount);
 
-userApiRouter.delete('/account', userApiController.removeAccount);
+userApiRouter.delete('/account', userApiController.removeMoneyFromAccount);
 
 userApiRouter.post('/order/product', userApiController.addProductToOrder);
 

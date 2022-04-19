@@ -36,7 +36,7 @@ module.exports.createUser = async (request, response) => {
 }
 
 
-module.exports.addAccount = async (request, response) => {
+module.exports.addMoneyToAccount = async (request, response) => {
 
    const email = request.body.email;
    const amountOfMoney = parseFloat(request.body.amountOfMoney);
@@ -55,7 +55,7 @@ module.exports.addAccount = async (request, response) => {
 }
 
 
-module.exports.removeAccount = async (request, response) => {
+module.exports.removeMoneyFromAccount = async (request, response) => {
 
    const email = request.body.email;
    const amountOfMoney = parseFloat(request.body.amountOfMoney);
@@ -96,28 +96,27 @@ module.exports.addProductToOrder = async (request, response) => {
       const user = await User.findOne({where: {email: userEmail}});
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await Order.findOne({where: {user_id: user.id}});
+      const order = await Order.findOne({where: {userId: user.id}});
       
       if (order) {
 
          const orderProduct = await OrderProduct.findOne({
             where: {
-               order_id: order.id,
-               product_id: productId,
+               orderId: order.id,
+               productId: productId,
             }
          });
 
          if (orderProduct) {
 
             await OrderProduct.update({quantity: orderProduct.quantity + productQuantity}, 
-               {where: {order_id: order.id}});
+               {where: {orderId: order.id}});
 
          }  else {
 
-            await OrderProduct.create({  // ! repeated code
-               user_id: user.id,
-               order_id: order.id,
-               product_id: productId,
+            await order.createOrderProduct({  // ! repeated code
+               userId: user.id,
+               productId: productId,
                quantity: productQuantity,
             });
 
@@ -125,14 +124,14 @@ module.exports.addProductToOrder = async (request, response) => {
 
       } else {
 
-         const order = await Order.create({user_id: user.id});
+         const order = await user.createOrder();
 
-         await OrderProduct.create({   // ! repeated code
-            user_id: user.id,
-            order_id: order.id,
-            product_id: productId,
+         await order.createOrderProduct({   // ! repeated code
+            userId: user.id,
+            productId: productId,
             quantity: productQuantity,
          });
+
       }
 
       return response.sendStatus(200);
@@ -159,13 +158,13 @@ module.exports.removeProductFromOrder = async (request, response) => {
       const user = await User.findOne({where: {id: userId}});
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await Order.findOne({where: {user_id: user.id}});
+      const order = await Order.findOne({where: {userId: user.id}});
       if (!order) return response.status(404).send({message: 'Order does not exist'});
 
-      const orderProduct = await OrderProduct.findOne({where: {order_id: order.id, product_id: productId}});
+      const orderProduct = await OrderProduct.findOne({where: {orderId: order.id, productId: productId}});
       if (!orderProduct) return response.status(404).send({message: 'Product does not exist in order'});
 
-      await OrderProduct.destroy({where: {order_id: order.id, product_id: productId}});
+      await OrderProduct.destroy({where: {orderId: order.id, productId}});
 
       response.sendStatus(200);
 
@@ -186,12 +185,10 @@ module.exports.removeOrder = async (request, response) => {
       const user = await User.findOne({where: {id: userId}});
       if (!user) return response.status(401).send({message: 'User does not exist'});
 
-      const order = await Order.findOne({where: {user_id: user.id}});
+      const order = await Order.findOne({where: {userId: user.id}});
       if (!order) return response.status(404).send({message: 'Order does not exist'});
 
-      await OrderProduct.destroy({where: {order_id: order.id}});
-
-      await Order.destroy({where: {user_id: user.id}});
+      await Order.destroy({where: {userId: user.id}});
 
       response.sendStatus(200);
 
@@ -213,19 +210,19 @@ module.exports.completeOrder = async (request, response) => {
       const user = await User.findOne({where: {id: userId}});
       if (!user) return response.status(401).send({message: 'User does not exist'});
 
-      const order = await Order.findOne({where: {user_id: user.id}});
+      const order = await Order.findOne({where: {userId: user.id}});
       if (!order) return response.status(404).send({message: 'Order does not exist'});
       
-      const orderProducts = await OrderProduct.findAll({where: {order_id: order.id}});
+      const orderProducts = await OrderProduct.findAll({where: {orderId: order.id}});
       if (orderProducts[0] === undefined) return response.status(404).send({message: 'No products in order'});
 
       let purchasePrice = 0;
 
       for (let i = 0; i < orderProducts.length; i++) {
 
-         const product = await Product.findOne({where: {id: orderProducts[i].product_id}});
+         const product = await Product.findOne({where: {id: orderProducts[i].productId}});
          if (!product) {
-            return response.status(404).send({message: `Product ID ${orderProducts[i].product_id} does not exist`});
+            return response.status(404).send({message: `Product ID ${orderProducts[i].productId} does not exist`});
          }
          console.log(product.price, orderProducts[i].quantity);
          purchasePrice += product.price * orderProducts[i].quantity;
@@ -235,8 +232,8 @@ module.exports.completeOrder = async (request, response) => {
       if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'});
 
       await User.update({account: resultedAccount}, {where: {id: user.id}});
-      await OrderProduct.destroy({where: {order_id: order.id}});
-      await Order.destroy({where: {user_id: user.id}});
+      await OrderProduct.destroy({where: {orderId: order.id}});
+      await Order.destroy({where: {userId: user.id}});
 
       response.sendStatus(200);
 

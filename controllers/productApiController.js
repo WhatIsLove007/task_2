@@ -17,7 +17,7 @@ module.exports.add = async (request, response) => {
       const category = await Category.findOne({where: {id: categoryId}});
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
-      await category.createProduct({name, description, category_id: categoryId, price});
+      await category.createProduct({name, description, price});
 
       response.sendStatus(200);
       
