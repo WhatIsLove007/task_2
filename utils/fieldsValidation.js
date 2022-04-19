@@ -1,9 +1,9 @@
-module.exports.validateFields = (fields) => {
+module.exports.validateFields = fields => {
 
-      fields?.forEach(field => {
-         if (!field) {
-            throw new Error(`No data in request body`);
-         }
-      });
+   fields.forEach(field => {
+      if (!(field || field === null || field === 0)) {
+         throw new Error(`No data in request body`);
+      }
+   });
 
 }

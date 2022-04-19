@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize').Sequelize;
 const sequelize = require('../models/sequelize');
 
-module.exports = sequelize.define('order_product', {
+const OrderProduct =  sequelize.define('order_product', {
    user_id: {
       type: Sequelize.INTEGER,
       allowNull: false,
@@ -18,4 +18,8 @@ module.exports = sequelize.define('order_product', {
       type: Sequelize.INTEGER,
       allowNull: false,
    },
-})
+});
+
+OrderProduct.removeAttribute('id');
+
+module.exports = OrderProduct;

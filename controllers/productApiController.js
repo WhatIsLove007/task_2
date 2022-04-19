@@ -6,7 +6,7 @@ const errorHandler = require('../utils/errorHandler');
 module.exports.add = async (request, response) => {
 
    const {name, description, categoryId} = request.body;
-   const price = parseInt(request.body.price);
+   const price = parseFloat(request.body.price);
 
    try {
       fieldsValidation.validateFields([name, description, categoryId, price]);
@@ -69,7 +69,7 @@ module.exports.get = async (request, response) => {
 module.exports.getAll = async (request, response) => {
    
    try {
-      const products = await Product.findAll();
+      const products = await Product.findAll({raw: true});
       if (!products.length) return response.status(404).send({message: 'No products'});
 
       response.send(products);

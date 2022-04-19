@@ -1,8 +1,8 @@
 const express = require('express');
 const Sequelize = require('sequelize');
-const dotenv = require('dotenv').config()
+const dotenv = require('dotenv').config();
 
-// const sequelize = require('./models/User');
+// const sequelize = require('./models/OrderProduct');
 const userApiRouter = require('./routes/userApiRouter');
 const productApiRouter = require('./routes/productApiRouter');
 const categoryApiRouter = require('./routes/categoryApiRouter');
