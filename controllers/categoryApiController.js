@@ -84,3 +84,16 @@ module.exports.update = async (request, response) => {
    }
 
 }
+
+
+module.exports.getAll = async (request, response) => {
+   try {
+      const categories = await Category.findAll();
+      if (!categories.length) return response.status(404).send({message: 'No category'});
+
+      response.send(categories);
+
+   } catch (error) {
+      errorHandler.handle(error, response);
+   }
+}

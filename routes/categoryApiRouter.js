@@ -11,5 +11,7 @@ categoryApiRouter.get('/', categoryApiController.get);
 
 categoryApiRouter.put('/', categoryApiController.update);
 
+categoryApiRouter.get('/all', categoryApiController.getAll);
+
 
 module.exports = categoryApiRouter;
