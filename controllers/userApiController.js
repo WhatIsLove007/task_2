@@ -1,3 +1,4 @@
+const sequelize = require('../models/sequelize');
 const User = require('../models/User');
 const Order = require('../models/Order');
 const OrderProduct = require('../models/OrderProduct');
@@ -88,7 +89,7 @@ module.exports.addProductToOrder = async (request, response) => {
 
 
    try {
-      fieldsValidation.validateFields([userEmail, productId, productQuantity]);
+      fieldsValidation.validateFields([userEmail, productId, productQuantity]);         
       
       const product = await Product.findOne({where: {id: productId}});
       if (!product) return response.status(404).send({message: 'Product does not exist'});
@@ -97,48 +98,49 @@ module.exports.addProductToOrder = async (request, response) => {
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
       const order = await Order.findOne({where: {userId: user.id}});
-      
-      if (order) {
 
-         const orderProduct = await OrderProduct.findOne({
-            where: {
-               orderId: order.id,
-               productId: productId,
+      const transaction = await sequelize.transaction();
+
+      try {
+
+         if (order) {
+            const orderProduct = await OrderProduct.findOne({
+               where: {
+                  orderId: order.id,
+                  productId: productId,
+               }
+            });
+   
+            if (orderProduct) {
+               await OrderProduct.update({quantity: orderProduct.quantity + productQuantity}, 
+                  {where: {orderId: order.id}});
+            }  else {
+               await order.createOrderProduct({  // ! repeated code
+                  userId: user.id,
+                  productId: productId,
+                  quantity: productQuantity,
+               });
             }
-         });
-
-         if (orderProduct) {
-
-            await OrderProduct.update({quantity: orderProduct.quantity + productQuantity}, 
-               {where: {orderId: order.id}});
-
-         }  else {
-
-            await order.createOrderProduct({  // ! repeated code
+   
+         } else {
+            const order = await user.createOrder({}, {transaction});
+            await order.createOrderProduct({   // ! repeated code
                userId: user.id,
                productId: productId,
                quantity: productQuantity,
-            });
-
+            }, {transaction});
          }
+   
+         await transaction.commit();
+         return response.sendStatus(200);
 
-      } else {
-
-         const order = await user.createOrder();
-
-         await order.createOrderProduct({   // ! repeated code
-            userId: user.id,
-            productId: productId,
-            quantity: productQuantity,
-         });
-
+      } catch (error) {
+         await transaction.rollback();
+         throw error;
       }
-
-      return response.sendStatus(200);
 
    } catch (error) {
       errorHandler.handle(error, response);
-
    }
 
 }
@@ -224,18 +226,24 @@ module.exports.completeOrder = async (request, response) => {
          if (!product) {
             return response.status(404).send({message: `Product ID ${orderProducts[i].productId} does not exist`});
          }
-         console.log(product.price, orderProducts[i].quantity);
          purchasePrice += product.price * orderProducts[i].quantity;
       }
 
       const resultedAccount = user.account - purchasePrice;
+
       if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'});
 
-      await User.update({account: resultedAccount}, {where: {id: user.id}});
-      await OrderProduct.destroy({where: {orderId: order.id}});
-      await Order.destroy({where: {userId: user.id}});
+      const transaction = await sequelize.transaction();
+      try {
+         await user.update({account: resultedAccount}, {transaction});
+         await Order.destroy({where: {userId: user.id}}, {transaction});
 
-      response.sendStatus(200);
+         await transaction.commit();
+         response.sendStatus(200);
+   
+      } catch (error) {
+         throw error;
+      }
 
    } catch (error) {
       errorHandler.handle(error, response);
