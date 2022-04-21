@@ -24,11 +24,13 @@ const User = sequelize.define('user', {
       type: Sequelize.DECIMAL(11, 2),
       allowNull: false,
       defaultValue: 0,
-   }
+   },
 });
 
 User.hasOne(Order, {onDelete: 'cascade'});
+Order.belongsTo(User);
 
 User.hasMany(OrderProduct);
+OrderProduct.belongsTo(User);
 
 module.exports = User;

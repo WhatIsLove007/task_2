@@ -37,18 +37,20 @@ module.exports.createUser = async (request, response) => {
 }
 
 
-module.exports.addMoneyToAccount = async (request, response) => {
+module.exports.replenishmentOfMoneyOnAccount = async (request, response) => {
 
-   const email = request.body.email;
+   const userId = request.body.userId;
    const amountOfMoney = parseFloat(request.body.amountOfMoney);
 
    try {
-      fieldsValidation.validateFields([email, amountOfMoney]);
+      fieldsValidation.validateFields([userId, amountOfMoney]);
 
-      const user = await User.findOne({where: {email}});
-      if (!user) return response.status(403).send({message: 'Email does not exist'});
-      await User.update({account: user.account + amountOfMoney}, {where: {email}});
+      const user = await User.findByPk(userId);
+      if (!user) return response.status(404).send({message: 'User not found'});
+
+      await user.update({account: user.account + amountOfMoney});
       response.sendStatus(200);
+
    } catch (error) {
       errorHandler.handle(error, response);
    }
@@ -56,22 +58,22 @@ module.exports.addMoneyToAccount = async (request, response) => {
 }
 
 
-module.exports.removeMoneyFromAccount = async (request, response) => {
+module.exports.billingMoneyFromAccount = async (request, response) => {
 
-   const email = request.body.email;
+   const userId = request.body.userId;
    const amountOfMoney = parseFloat(request.body.amountOfMoney);
 
    try {
-      fieldsValidation.validateFields([email, amountOfMoney]);
+      fieldsValidation.validateFields([userId, amountOfMoney]);
 
-      const user = await User.findOne({where: {email}});
-      if (!user) return response.status(403).send({message: 'Email does not exist'});
+      const user = await User.findByPk(userId);
+      if (!user) return response.status(404).send({message: 'User not found'});
 
       const resultedAccount = user.account - amountOfMoney;
 
       if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'})
 
-      await User.update({account: resultedAccount}, {where: {email}});
+      await user.update({account: resultedAccount});
 
       response.sendStatus(200);
 
@@ -84,62 +86,59 @@ module.exports.removeMoneyFromAccount = async (request, response) => {
 
 module.exports.addProductToOrder = async (request, response) => {
 
-   const {userEmail, productId} = request.body;
+   const {userId, productId} = request.body;
    const productQuantity = parseInt(request.body.productQuantity);
 
+   const transaction = await sequelize.transaction();
 
    try {
-      fieldsValidation.validateFields([userEmail, productId, productQuantity]);         
+      fieldsValidation.validateFields([userId, productId, productQuantity]);         
       
-      const product = await Product.findOne({where: {id: productId}});
+      const product = await Product.findByPk(productId);
       if (!product) return response.status(404).send({message: 'Product does not exist'});
       
-      const user = await User.findOne({where: {email: userEmail}});
+      const user = await User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await Order.findOne({where: {userId: user.id}});
+      const order = await user.getOrder();
 
-      const transaction = await sequelize.transaction();
+      if (order) {
 
-      try {
-
-         if (order) {
-            const orderProduct = await OrderProduct.findOne({
-               where: {
-                  orderId: order.id,
-                  productId: productId,
-               }
-            });
-   
-            if (orderProduct) {
-               await OrderProduct.update({quantity: orderProduct.quantity + productQuantity}, 
-                  {where: {orderId: order.id}});
-            }  else {
-               await order.createOrderProduct({  // ! repeated code
-                  userId: user.id,
-                  productId: productId,
-                  quantity: productQuantity,
-               });
+         const orderProduct = await OrderProduct.findOne({
+            where: {
+               orderId: order.id,
+               productId,
             }
+         });
    
-         } else {
-            const order = await user.createOrder({}, {transaction});
-            await order.createOrderProduct({   // ! repeated code
+         if (orderProduct) {
+
+            await orderProduct.update({quantity: orderProduct.quantity + productQuantity});
+
+         }  else {
+
+            await order.createOrderProduct({  // ! repeated code
                userId: user.id,
                productId: productId,
                quantity: productQuantity,
-            }, {transaction});
+            });
          }
    
-         await transaction.commit();
-         return response.sendStatus(200);
-
-      } catch (error) {
-         await transaction.rollback();
-         throw error;
+      } else {
+         const order = await user.createOrder({}, {transaction});
+         await order.createOrderProduct({   // ! repeated code
+            userId: user.id,
+            productId: productId,
+            quantity: productQuantity,
+         }, {transaction});
       }
+   
+      await transaction.commit();
+      return response.sendStatus(200);
+
 
    } catch (error) {
+      await transaction.rollback();
       errorHandler.handle(error, response);
    }
 
@@ -154,19 +153,19 @@ module.exports.removeProductFromOrder = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId, productId]);
 
-      const product = await Product.findOne({where: {id: productId}});
+      const product = await Product.findByPk(productId);
       if (!product) return response.status(404).send({message: 'Product does not exist'});
 
-      const user = await User.findOne({where: {id: userId}});
+      const user = await User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await Order.findOne({where: {userId: user.id}});
+      const order = await user.getOrder();
       if (!order) return response.status(404).send({message: 'Order does not exist'});
 
-      const orderProduct = await OrderProduct.findOne({where: {orderId: order.id, productId: productId}});
+      const orderProduct = await OrderProduct.findOne({where: {orderId: order.id, productId}});
       if (!orderProduct) return response.status(404).send({message: 'Product does not exist in order'});
 
-      await OrderProduct.destroy({where: {orderId: order.id, productId}});
+      await orderProduct.destroy();
 
       response.sendStatus(200);
 
@@ -184,13 +183,13 @@ module.exports.removeOrder = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId]);
 
-      const user = await User.findOne({where: {id: userId}});
-      if (!user) return response.status(401).send({message: 'User does not exist'});
+      const user = await User.findByPk(userId);
+      if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await Order.findOne({where: {userId: user.id}});
+      const order = await user.getOrder();
       if (!order) return response.status(404).send({message: 'Order does not exist'});
 
-      await Order.destroy({where: {userId: user.id}});
+      await order.destroy();
 
       response.sendStatus(200);
 
@@ -206,23 +205,27 @@ module.exports.completeOrder = async (request, response) => {
 
    const userId = request.body.userId;
 
+   const transaction = await sequelize.transaction();
+
    try {
       fieldsValidation.validateFields([userId]);
 
-      const user = await User.findOne({where: {id: userId}});
-      if (!user) return response.status(401).send({message: 'User does not exist'});
+      const user = await User.findByPk(userId);
+      if (!user) return response.status(404).send({message: 'User not found'});
 
-      const order = await Order.findOne({where: {userId: user.id}});
-      if (!order) return response.status(404).send({message: 'Order does not exist'});
+      const order = await user.getOrder();
+      if (!order) return response.status(404).send({message: 'Order not found'});
       
-      const orderProducts = await OrderProduct.findAll({where: {orderId: order.id}});
-      if (orderProducts[0] === undefined) return response.status(404).send({message: 'No products in order'});
+      const orderProducts = await order.getOrderProducts();
+      if (!orderProducts.length) return response.status(404).send({message: 'No products in order'});
 
       let purchasePrice = 0;
 
       for (let i = 0; i < orderProducts.length; i++) {
+         console.log(orderProducts);
+         const product = await orderProducts[i].getProduct();
+         console.log(product);
 
-         const product = await Product.findOne({where: {id: orderProducts[i].productId}});
          if (!product) {
             return response.status(404).send({message: `Product ID ${orderProducts[i].productId} does not exist`});
          }
@@ -233,17 +236,12 @@ module.exports.completeOrder = async (request, response) => {
 
       if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'});
 
-      const transaction = await sequelize.transaction();
-      try {
-         await user.update({account: resultedAccount}, {transaction});
-         await Order.destroy({where: {userId: user.id}}, {transaction});
+      await user.update({account: resultedAccount}, {transaction});
+      await Order.destroy({where: {userId: user.id}}, {transaction});
 
-         await transaction.commit();
-         response.sendStatus(200);
+      await transaction.commit();
+      response.sendStatus(200);
    
-      } catch (error) {
-         throw error;
-      }
 
    } catch (error) {
       errorHandler.handle(error, response);
@@ -260,7 +258,7 @@ module.exports.getUser = async (request, response) => {
 
       fieldsValidation.validateFields([id]);
 
-      const user = await User.findOne({where: {id}});
+      const user = await User.findByPk(id);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
       return response.send({
@@ -282,10 +280,10 @@ module.exports.deleteUser = async (request, response) => {
    try {
       fieldsValidation.validateFields([id]);
 
-      const user = await User.findOne({where: {id}});
+      const user = await User.findByPk(id);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      await User.destroy({where: {id}});
+      await user.destroy();
 
       return response.sendStatus(200);
 
@@ -305,10 +303,10 @@ module.exports.updateUser = async (request, response) => {
          return response.status(400).send({message: 'Incorrect email'});
       }
 
-      const user = await User.findOne({where: {id}});
+      const user = await User.findByPk(id);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      await User.update({email: newEmail}, {where: {id}});
+      await user.update({email: newEmail});
 
       return response.sendStatus(200);
 

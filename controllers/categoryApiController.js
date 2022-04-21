@@ -31,10 +31,10 @@ module.exports.remove = async (request, response) => {
 
       fieldsValidation.validateFields([id]);
 
-      const existingCategory = await Category.findOne({where: {id}});
-      if (!existingCategory) return response.status(404).send({message: 'Category does not exist'});
+      const category = await Category.findByPk(id);
+      if (!category) return response.status(404).send({message: 'Category does not exist'});
 
-      await Category.destroy({where: {id}});
+      await category.destroy();
       response.sendStatus(200);
       
    } catch (error) {
@@ -52,10 +52,10 @@ module.exports.get = async (request, response) => {
 
       fieldsValidation.validateFields([id]);
 
-      const category = await Category.findOne({where: {id}});
+      const category = await Category.findByPk(id);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
-      return response.status(200).send(category);
+      return response.send(category);
 
    } catch (error) {
       errorHandler.handle(error, response);
@@ -72,10 +72,10 @@ module.exports.update = async (request, response) => {
 
       fieldsValidation.validateFields([id, newName]);
 
-      const category = await Category.findOne({where: {id}});
+      const category = await Category.findByPk(id);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
-      await Category.update({name: newName}, {where: {id}});
+      await category.update({name: newName});
 
       return response.status(200);
 
@@ -106,7 +106,7 @@ module.exports.getProductsInCategory = async (request, response) => {
    try {
       fieldsValidation.validateFields([categoryId]);
 
-      const category = await Category.findOne({where: {id: categoryId}});
+      const category = await Category.findByPk(categoryId);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
       const products = await category.getProducts();

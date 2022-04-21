@@ -12,5 +12,6 @@ const Order = sequelize.define('order', {
 });
 
 Order.hasMany(OrderProduct, {onDelete: 'cascade'});
+OrderProduct.belongsTo(Order, {onDelete: 'cascade'});
 
 module.exports = Order;

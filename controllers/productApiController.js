@@ -14,7 +14,7 @@ module.exports.add = async (request, response) => {
       const existingProduct = await Product.findOne({where: {name}});
       if (existingProduct) return response.status(409).send({message: 'Product already exists'});
 
-      const category = await Category.findOne({where: {id: categoryId}});
+      const category = await Category.findByPk(categoryId);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
       await category.createProduct({name, description, price});
@@ -54,7 +54,7 @@ module.exports.get = async (request, response) => {
    try {
       fieldsValidation.validateFields([id]);
 
-      const product = await Product.findOne({where: {id}});
+      const product = await Product.findByPk(id);
       if (!product) return response.status(404).send({message: 'Product does not exist'});
       
       response.send(product);
