@@ -1,6 +1,6 @@
-const Sequelize = require('sequelize').Sequelize;
-const sequelize = require('../models/sequelize');
-const Product = require('../models/Product');
+import { Sequelize } from 'sequelize';
+import sequelize from '../models/sequelize.js';
+import Product from '../models/Product.js';
 
 const Category = sequelize.define('category', {
    id: {
@@ -19,4 +19,4 @@ const Category = sequelize.define('category', {
 Category.hasMany(Product);
 Product.belongsTo(Category);
 
-module.exports = Category;
+export default Category;

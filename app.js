@@ -1,11 +1,11 @@
-const express = require('express');
-const Sequelize = require('sequelize');
-const dotenv = require('dotenv').config();
+import express from 'express';
+import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv/config';
 
-const sequelize = require('./models/sequelize');
-const userApiRouter = require('./routes/userApiRouter');
-const productApiRouter = require('./routes/productApiRouter');
-const categoryApiRouter = require('./routes/categoryApiRouter');
+import { sequelize } from './models/sequelize.js';
+import { userApiRouter } from './routes/userApiRouter.js';
+import { productApiRouter } from './routes/productApiRouter.js';
+import { categoryApiRouter } from './routes/categoryApiRouter.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;

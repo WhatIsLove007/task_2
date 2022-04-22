@@ -1,5 +1,5 @@
-const Sequelize = require('sequelize').Sequelize;
-const sequelize = require('../models/sequelize');
+import { Sequelize } from 'sequelize';
+import sequelize from '../models/sequelize.js';
 
 const OrderProduct = sequelize.define('orderProduct', {
    quantity: {
@@ -10,4 +10,4 @@ const OrderProduct = sequelize.define('orderProduct', {
 
 OrderProduct.removeAttribute('id');
 
-module.exports = OrderProduct;
+export default OrderProduct;

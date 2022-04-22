@@ -1,9 +1,9 @@
-const Product = require('../models/Product');
-const Category = require('../models/Category');
-const fieldsValidation = require('../utils/fieldsValidation');
-const errorHandler = require('../utils/errorHandler');
+import Product from '../models/Product.js';
+import Category from '../models/Category.js';
+import * as fieldsValidation from '../utils/fieldsValidation.js';
+import * as  errorHandler from '../utils/errorHandler.js';
 
-module.exports.add = async (request, response) => {
+export const add = async (request, response) => {
 
    const {name, description, categoryId} = request.body;
    const price = parseFloat(request.body.price);
@@ -28,7 +28,7 @@ module.exports.add = async (request, response) => {
 }
 
 
-module.exports.remove = async (request, response) => {
+export const remove = async (request, response) => {
 
    const { id } = request.query;
 
@@ -47,7 +47,7 @@ module.exports.remove = async (request, response) => {
 }
 
 
-module.exports.get = async (request, response) => {
+export const get = async (request, response) => {
 
    const id = request.query.id;
 
@@ -66,7 +66,7 @@ module.exports.get = async (request, response) => {
 }
 
 
-module.exports.getAll = async (request, response) => {
+export const getAll = async (request, response) => {
    
    try {
       const products = await Product.findAll({raw: true});

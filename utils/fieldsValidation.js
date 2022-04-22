@@ -1,4 +1,4 @@
-module.exports.validateFields = fields => {
+export const validateFields = fields => {
 
    fields.forEach(field => {
       if (!(field || field === null || field === 0)) {

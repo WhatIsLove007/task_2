@@ -1,4 +1,4 @@
-module.exports.handle = (error, response) => {
+export const handle = (error, response) => {
 
    switch (error.message) {
       case 'No data in request body':

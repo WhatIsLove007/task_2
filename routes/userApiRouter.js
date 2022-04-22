@@ -1,6 +1,6 @@
-const express = require('express');
-const userApiRouter = express.Router();
-const userApiController = require('../controllers/userApiController');
+import express from 'express';
+import * as userApiController from '../controllers/userApiController.js';
+export const userApiRouter = express.Router();
 
 
 userApiRouter.post('/', userApiController.createUser);
@@ -22,6 +22,3 @@ userApiRouter.delete('/order/product', userApiController.removeProductFromOrder)
 userApiRouter.delete('/order', userApiController.removeOrder);
 
 userApiRouter.post('/order', userApiController.completeOrder);
-
-
-module.exports = userApiRouter;

@@ -1,6 +1,6 @@
-const Sequelize = require('sequelize').Sequelize;
-const sequelize = require('../models/sequelize');
-const OrderProduct = require('../models/OrderProduct');
+import { Sequelize } from 'sequelize';
+import sequelize from '../models/sequelize.js';
+import OrderProduct from '../models/OrderProduct.js';
 
 const Product = sequelize.define('product', {
    id: {
@@ -27,4 +27,4 @@ const Product = sequelize.define('product', {
 Product.hasMany(OrderProduct, {onDelete: 'cascade'});
 OrderProduct.belongsTo(Product, {onDelete: 'cascade'});
 
-module.exports = Product;
+export default Product;

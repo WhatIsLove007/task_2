@@ -1,8 +1,8 @@
-const Category = require('../models/Category');
-const fieldsValidation = require('../utils/fieldsValidation');
-const errorHandler = require('../utils/errorHandler');
+import Category from '../models/Category.js';
+import * as fieldsValidation from '../utils/fieldsValidation.js';
+import * as errorHandler from '../utils/errorHandler.js';
 
-module.exports.add = async (request, response) => {
+export const add = async (request, response) => {
 
    const name = request.body.name;
 
@@ -23,7 +23,7 @@ module.exports.add = async (request, response) => {
 }
 
 
-module.exports.remove = async (request, response) => {
+export const remove = async (request, response) => {
 
    const id = request.query.id;
 
@@ -44,7 +44,7 @@ module.exports.remove = async (request, response) => {
 }
 
 
-module.exports.get = async (request, response) => {
+export const get = async (request, response) => {
 
    const id = request.query.id;
 
@@ -64,7 +64,7 @@ module.exports.get = async (request, response) => {
 }
 
 
-module.exports.update = async (request, response) => {
+export const update = async (request, response) => {
 
    const {id, newName} = request.body;
 
@@ -86,7 +86,7 @@ module.exports.update = async (request, response) => {
 }
 
 
-module.exports.getAll = async (request, response) => {
+export const getAll = async (request, response) => {
    try {
       const categories = await Category.findAll();
       if (!categories.length) return response.status(404).send({message: 'No categories'});
@@ -99,7 +99,7 @@ module.exports.getAll = async (request, response) => {
 }
 
 
-module.exports.getProductsInCategory = async (request, response) => {
+export const getProductsInCategory = async (request, response) => {
    
    const categoryId = request.query.categoryId;
 

@@ -1,7 +1,7 @@
-const Sequelize = require('sequelize').Sequelize;
-const sequelize = require('../models/sequelize');
-const Order = require('../models/Order');
-const OrderProduct = require('../models/OrderProduct');
+import { Sequelize } from 'sequelize';
+import sequelize from '../models/sequelize.js';
+import Order from '../models/Order.js';
+import OrderProduct from '../models/OrderProduct.js';
 
 
 const User = sequelize.define('user', {
@@ -33,4 +33,4 @@ Order.belongsTo(User);
 User.hasMany(OrderProduct);
 OrderProduct.belongsTo(User);
 
-module.exports = User;
+export default User;

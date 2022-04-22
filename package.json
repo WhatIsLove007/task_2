@@ -32,5 +32,6 @@
     "mysql2": "^2.3.3",
     "sequelize": "^6.19.0",
     "validator": "^13.7.0"
-  }
+  },
+  "type": "module"
 }

@@ -1,15 +1,15 @@
-const sequelize = require('../models/sequelize');
-const User = require('../models/User');
-const Order = require('../models/Order');
-const OrderProduct = require('../models/OrderProduct');
-const Product = require('../models/Product');
-const entryDataValidation = require('../utils/entryDataValidation');
-const passwordHashing = require('../utils/passwordHashing');
-const fieldsValidation = require('../utils/fieldsValidation');
-const errorHandler = require('../utils/errorHandler');
+import { sequelize } from '../models/sequelize.js';
+import User from '../models/User.js';
+import Order from '../models/Order.js';
+import OrderProduct from '../models/OrderProduct.js';
+import Product from '../models/Product.js';
+import * as entryDataValidation from '../utils/entryDataValidation.js';
+import * as passwordHashing from '../utils/passwordHashing.js';
+import * as fieldsValidation from '../utils/fieldsValidation.js';
+import * as errorHandler from '../utils/errorHandler.js';
 
 
-module.exports.createUser = async (request, response) => {
+export const createUser = async (request, response) => {
    
    const {email, password} = request.body;
 
@@ -37,7 +37,7 @@ module.exports.createUser = async (request, response) => {
 }
 
 
-module.exports.replenishmentOfMoneyOnAccount = async (request, response) => {
+export const replenishmentOfMoneyOnAccount = async (request, response) => {
 
    const userId = request.body.userId;
    const amountOfMoney = parseFloat(request.body.amountOfMoney);
@@ -58,7 +58,7 @@ module.exports.replenishmentOfMoneyOnAccount = async (request, response) => {
 }
 
 
-module.exports.billingMoneyFromAccount = async (request, response) => {
+export const billingMoneyFromAccount = async (request, response) => {
 
    const userId = request.body.userId;
    const amountOfMoney = parseFloat(request.body.amountOfMoney);
@@ -84,7 +84,7 @@ module.exports.billingMoneyFromAccount = async (request, response) => {
 }
 
 
-module.exports.addProductToOrder = async (request, response) => {
+export const addProductToOrder = async (request, response) => {
 
    const {userId, productId} = request.body;
    const productQuantity = parseInt(request.body.productQuantity);
@@ -145,7 +145,7 @@ module.exports.addProductToOrder = async (request, response) => {
 }
 
 
-module.exports.removeProductFromOrder = async (request, response) => {
+export const removeProductFromOrder = async (request, response) => {
 
    const {userId, productId} = request.query;
 
@@ -176,7 +176,7 @@ module.exports.removeProductFromOrder = async (request, response) => {
 }
 
 
-module.exports.removeOrder = async (request, response) => {
+export const removeOrder = async (request, response) => {
 
    const userId = request.query.userId;
  
@@ -201,7 +201,7 @@ module.exports.removeOrder = async (request, response) => {
 }
 
 
-module.exports.completeOrder = async (request, response) => {
+export const completeOrder = async (request, response) => {
 
    const userId = request.body.userId;
 
@@ -250,7 +250,7 @@ module.exports.completeOrder = async (request, response) => {
 }
 
 
-module.exports.getUser = async (request, response) => {
+export const getUser = async (request, response) => {
 
    const id = request.query.id;
 
@@ -273,7 +273,7 @@ module.exports.getUser = async (request, response) => {
    }
 }
 
-module.exports.deleteUser = async (request, response) => {
+export const deleteUser = async (request, response) => {
 
    const id = request.query.id;
 
@@ -292,7 +292,7 @@ module.exports.deleteUser = async (request, response) => {
    }
 }
 
-module.exports.updateUser = async (request, response) => {
+export const updateUser = async (request, response) => {
 
    const {id, newEmail} = request.body;
 
