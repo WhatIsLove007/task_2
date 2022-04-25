@@ -4,7 +4,8 @@
   "description": "Car store for millionaires",
   "main": "app.js",
   "scripts": {
-    "test": "ffdfdf"
+    "babel": "nodemon --exec npx babel-node ./app.js",
+    "db:create": "babel-node -r dotenv/config ./node_modules/.bin/sequelize db:create"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,13 @@
   },
   "homepage": "https://github.com/WhatIsLove007/task_2#readme",
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.9",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/register": "^7.17.7",
+    "nodemon": "^2.0.15",
+    "sequelize-cli": "^6.4.1"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -32,6 +39,5 @@
     "mysql2": "^2.3.3",
     "sequelize": "^6.19.0",
     "validator": "^13.7.0"
-  },
-  "type": "module"
+  }
 }

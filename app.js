@@ -1,8 +1,7 @@
 import express from 'express';
-import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv/config';
 
-import { sequelize } from './models/sequelize.js';
+// import models from './models';
 import { userApiRouter } from './routes/userApiRouter.js';
 import { productApiRouter } from './routes/productApiRouter.js';
 import { categoryApiRouter } from './routes/categoryApiRouter.js';
@@ -23,10 +22,10 @@ app.use('/api/category', categoryApiRouter);
 
 
 
-sequelize.sync()
-   .then(() => {
-      app.listen(PORT, () => console.log(`Server has been started on PORT ${PORT}...`));
-   })
-   .catch(error => console.log(error))
+// sequelize.sync()
+//    .then(() => {
+//       app.listen(PORT, () => console.log(`Server has been started on PORT ${PORT}...`));
+//    })
+//    .catch(error => console.log(error))
 
-// app.listen(PORT, () => console.log(`Server has been started on PORT ${PORT}...`));
+app.listen(PORT, () => console.log(`Server has been started on PORT ${PORT}...`));

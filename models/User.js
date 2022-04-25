@@ -1,36 +1,35 @@
-import { Sequelize } from 'sequelize';
-import sequelize from '../models/sequelize.js';
-import Order from '../models/Order.js';
-import OrderProduct from '../models/OrderProduct.js';
+import { Model } from 'sequelize';
 
+export default class User extends Model {
+  
+  static init = (sequelize, DataTypes) => {
+    return super.init({
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+     },
+     email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+     },
+     password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+     },
+     account: {
+        type: DataTypes.DECIMAL(11, 2),
+        allowNull: false,
+        defaultValue: 0,
+      },
+    }, {sequelize})
+  }
 
-const User = sequelize.define('user', {
-   id: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-   },
-   email: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-   },                            // can use validate: {isEmail: true}
-   password: {
-      type: Sequelize.STRING,
-      allowNull: false,
-   },
-   account: {
-      type: Sequelize.DECIMAL(11, 2),
-      allowNull: false,
-      defaultValue: 0,
-   },
-});
-
-User.hasOne(Order, {onDelete: 'cascade'});
-Order.belongsTo(User);
-
-User.hasMany(OrderProduct);
-OrderProduct.belongsTo(User);
-
-export default User;
+  static associate(models) {
+    this.hasOne(models.Order, {onDelete: 'cascade', foreignKey: 'userId'});
+    this.hasMany(models.OrderProduct, {onDelete: 'cascade', foreignKey: 'userId'});
+  }
+  
+};

@@ -1,30 +1,35 @@
-import { Sequelize } from 'sequelize';
-import sequelize from '../models/sequelize.js';
-import OrderProduct from '../models/OrderProduct.js';
+import { Model } from 'sequelize';
 
-const Product = sequelize.define('product', {
-   id: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-   },
-   name: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-   },
-   description: {
-      type: Sequelize.TEXT,
-      allowNull: false,
-   },
-   price: {
-      type: Sequelize.DECIMAL(10, 2),
-      allowNull: false,
-   },
-});
+export default class Product extends Model {
+  
+  static init = (sequelize, DataTypes) => {
+    return super.init({
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        references: {model: 'Categories'}
+      },
+    }, {sequelize})
+  }
 
-Product.hasMany(OrderProduct, {onDelete: 'cascade'});
-OrderProduct.belongsTo(Product, {onDelete: 'cascade'});
-
-export default Product;
+  static associate(models) {
+    this.hasMany(models.OrderProduct, {onDelete: 'cascade', foreignKey: 'productId'});
+    this.belongsTo(models.Category, {foreignKey: 'categoryId'});
+  }
+  
+};

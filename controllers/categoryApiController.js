@@ -1,4 +1,4 @@
-import Category from '../models/Category.js';
+import models from '../models';
 import * as fieldsValidation from '../utils/fieldsValidation.js';
 import * as errorHandler from '../utils/errorHandler.js';
 
@@ -10,10 +10,10 @@ export const add = async (request, response) => {
 
       fieldsValidation.validateFields([name]);
 
-      const existingCategory = await Category.findOne({where: {name}});
+      const existingCategory = await models.Category.findOne({where: {name}});
       if (existingCategory) return response.status(409).send({message: 'Category already exists'});
 
-      await Category.create({name});
+      await models.Category.create({name});
       response.sendStatus(200);
       
    } catch (error) {
@@ -31,7 +31,7 @@ export const remove = async (request, response) => {
 
       fieldsValidation.validateFields([id]);
 
-      const category = await Category.findByPk(id);
+      const category = await models.Category.findByPk(id);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
       await category.destroy();
@@ -52,7 +52,7 @@ export const get = async (request, response) => {
 
       fieldsValidation.validateFields([id]);
 
-      const category = await Category.findByPk(id);
+      const category = await models.Category.findByPk(id);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
       return response.send(category);
@@ -72,7 +72,7 @@ export const update = async (request, response) => {
 
       fieldsValidation.validateFields([id, newName]);
 
-      const category = await Category.findByPk(id);
+      const category = await models.Category.findByPk(id);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
       await category.update({name: newName});
@@ -88,7 +88,7 @@ export const update = async (request, response) => {
 
 export const getAll = async (request, response) => {
    try {
-      const categories = await Category.findAll();
+      const categories = await models.Category.findAll();
       if (!categories.length) return response.status(404).send({message: 'No categories'});
 
       response.send(categories);
@@ -106,7 +106,7 @@ export const getProductsInCategory = async (request, response) => {
    try {
       fieldsValidation.validateFields([categoryId]);
 
-      const category = await Category.findByPk(categoryId);
+      const category = await models.Category.findByPk(categoryId);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
       const products = await category.getProducts();

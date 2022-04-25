@@ -1,8 +1,5 @@
-import { sequelize } from '../models/sequelize.js';
-import User from '../models/User.js';
-import Order from '../models/Order.js';
-import OrderProduct from '../models/OrderProduct.js';
-import Product from '../models/Product.js';
+import { sequelize } from '../models/index.js';
+import models from '../models';
 import * as entryDataValidation from '../utils/entryDataValidation.js';
 import * as passwordHashing from '../utils/passwordHashing.js';
 import * as fieldsValidation from '../utils/fieldsValidation.js';
@@ -24,10 +21,10 @@ export const createUser = async (request, response) => {
          return response.status(400).send({message: 'Incorrect password'});
       }
    
-      const user = await User.findOne({where: {email}});
+      const user = await models.User.findOne({where: {email}});
       if (user) return response.status(401).send({message: 'Email already exist'});
 
-      await User.create({email, password: await passwordHashing.hash(password)});
+      await models.User.create({email, password: await passwordHashing.hash(password)});
 
       response.sendStatus(200);
 
@@ -45,7 +42,7 @@ export const replenishmentOfMoneyOnAccount = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId, amountOfMoney]);
 
-      const user = await User.findByPk(userId);
+      const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User not found'});
 
       await user.update({account: user.account + amountOfMoney});
@@ -66,7 +63,7 @@ export const billingMoneyFromAccount = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId, amountOfMoney]);
 
-      const user = await User.findByPk(userId);
+      const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User not found'});
 
       const resultedAccount = user.account - amountOfMoney;
@@ -94,17 +91,17 @@ export const addProductToOrder = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId, productId, productQuantity]);         
       
-      const product = await Product.findByPk(productId);
+      const product = await models.Product.findByPk(productId);
       if (!product) return response.status(404).send({message: 'Product does not exist'});
       
-      const user = await User.findByPk(userId);
+      const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
       const order = await user.getOrder();
 
       if (order) {
 
-         const orderProduct = await OrderProduct.findOne({
+         const orderProduct = await models.OrderProduct.findOne({
             where: {
                orderId: order.id,
                productId,
@@ -153,16 +150,16 @@ export const removeProductFromOrder = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId, productId]);
 
-      const product = await Product.findByPk(productId);
+      const product = await models.Product.findByPk(productId);
       if (!product) return response.status(404).send({message: 'Product does not exist'});
 
-      const user = await User.findByPk(userId);
+      const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
       const order = await user.getOrder();
       if (!order) return response.status(404).send({message: 'Order does not exist'});
 
-      const orderProduct = await OrderProduct.findOne({where: {orderId: order.id, productId}});
+      const orderProduct = await models.OrderProduct.findOne({where: {orderId: order.id, productId}});
       if (!orderProduct) return response.status(404).send({message: 'Product does not exist in order'});
 
       await orderProduct.destroy();
@@ -183,7 +180,7 @@ export const removeOrder = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId]);
 
-      const user = await User.findByPk(userId);
+      const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
       const order = await user.getOrder();
@@ -210,7 +207,7 @@ export const completeOrder = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId]);
 
-      const user = await User.findByPk(userId);
+      const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User not found'});
 
       const order = await user.getOrder();
@@ -237,7 +234,7 @@ export const completeOrder = async (request, response) => {
       if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'});
 
       await user.update({account: resultedAccount}, {transaction});
-      await Order.destroy({where: {userId: user.id}}, {transaction});
+      await models.Order.destroy({where: {userId: user.id}}, {transaction});
 
       await transaction.commit();
       response.sendStatus(200);
@@ -258,7 +255,7 @@ export const getUser = async (request, response) => {
 
       fieldsValidation.validateFields([id]);
 
-      const user = await User.findByPk(id);
+      const user = await models.User.findByPk(id);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
       return response.send({
@@ -280,7 +277,7 @@ export const deleteUser = async (request, response) => {
    try {
       fieldsValidation.validateFields([id]);
 
-      const user = await User.findByPk(id);
+      const user = await models.User.findByPk(id);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
       await user.destroy();
@@ -303,7 +300,7 @@ export const updateUser = async (request, response) => {
          return response.status(400).send({message: 'Incorrect email'});
       }
 
-      const user = await User.findByPk(id);
+      const user = await models.User.findByPk(id);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
       await user.update({email: newEmail});

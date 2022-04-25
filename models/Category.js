@@ -1,22 +1,25 @@
-import { Sequelize } from 'sequelize';
-import sequelize from '../models/sequelize.js';
-import Product from '../models/Product.js';
+import { Model } from 'sequelize';
 
-const Category = sequelize.define('category', {
-   id: {
-      type: Sequelize.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-      allowNull: false,
-   },
-   name: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-   },
-});
+export default class Category extends Model {
+  
+  static init = (sequelize, DataTypes) => {
+    return super.init({
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+    }, {sequelize})
+  }
 
-Category.hasMany(Product);
-Product.belongsTo(Category);
-
-export default Category;
+  static associate(models) {
+    this.hasMany(models.Product, {foreignKey: 'categoryId'});
+  }
+  
+};
