@@ -22,7 +22,6 @@ export default class Product extends Model {
       price: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
-        references: {model: 'Categories'}
       },
       categoryId: {
         type: DataTypes.INTEGER,

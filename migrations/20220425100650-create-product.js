@@ -21,7 +21,6 @@ module.exports = {
       price: {
         type: Sequelize.DECIMAL(10, 2),
         allowNull: false,
-        references: {model: 'Categories'}
       },
       createdAt: {
         allowNull: false,
