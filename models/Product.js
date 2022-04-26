@@ -24,6 +24,10 @@ export default class Product extends Model {
         allowNull: false,
         references: {model: 'Categories'}
       },
+      categoryId: {
+        type: DataTypes.INTEGER,
+        references: {model: 'Categories'}
+      },
     }, {sequelize})
   }
 

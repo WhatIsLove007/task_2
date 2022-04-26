@@ -109,7 +109,7 @@ export const addProductToOrder = async (request, response) => {
                userId: user.id,
                productId: productId,
                quantity: productQuantity,
-            });
+            }, {transaction});
          }
    
       } else {
