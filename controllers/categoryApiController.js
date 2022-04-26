@@ -77,7 +77,7 @@ export const update = async (request, response) => {
 
       await category.update({name: newName});
 
-      return response.status(200);
+      return response.sendStatus(200);
 
    } catch (error) {
       errorHandler.handle(error, response);

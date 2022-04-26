@@ -34,45 +34,36 @@ export const createUser = async (request, response) => {
 }
 
 
-export const replenishmentOfMoneyOnAccount = async (request, response) => {
+export const balance = async (request, response) => {
 
    const userId = request.body.userId;
    const amountOfMoney = parseFloat(request.body.amountOfMoney);
+   const action = request.body.action;
 
    try {
-      fieldsValidation.validateFields([userId, amountOfMoney]);
+      fieldsValidation.validateFields([userId, amountOfMoney, action]);
 
       const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User not found'});
 
-      await user.update({account: user.account + amountOfMoney});
-      response.sendStatus(200);
 
-   } catch (error) {
-      errorHandler.handle(error, response);
-   }
+      if (action === 'replenishment') {
+         const resultedBalance = parseFloat(user.account) + amountOfMoney;
+         await user.update({account: resultedBalance});
 
-}
+      }  else if (action === 'billing') {
+         const resultedBalance = user.account - amountOfMoney;
+         if (resultedBalance < 0) return response.status(403).send({message: 'Payment prohibited'});
+
+         await user.update({account: resultedBalance});
+
+      }  else {
+         return response.status(400).send({message: 'Incorrect action'});
+
+      }
 
 
-export const billingMoneyFromAccount = async (request, response) => {
-
-   const userId = request.body.userId;
-   const amountOfMoney = parseFloat(request.body.amountOfMoney);
-
-   try {
-      fieldsValidation.validateFields([userId, amountOfMoney]);
-
-      const user = await models.User.findByPk(userId);
-      if (!user) return response.status(404).send({message: 'User not found'});
-
-      const resultedAccount = user.account - amountOfMoney;
-
-      if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'})
-
-      await user.update({account: resultedAccount});
-
-      response.sendStatus(200);
+      return response.sendStatus(200);
 
    } catch (error) {
       errorHandler.handle(error, response);
