@@ -25,7 +25,7 @@ export default class Product extends Model {
       },
       subcategoryId: {
         type: DataTypes.INTEGER,
-        references: {model: 'Categories'}
+        references: {model: 'Subcategories'}
       },
     }, {sequelize})
   }

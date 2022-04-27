@@ -29,14 +29,23 @@ module.exports = {
       }
     });
 
-    await queryInterface.renameColumn('Products', 'categoryId', 'subcategoryId');
+    await queryInterface.removeColumn('Products', 'categoryId');
+
+    await queryInterface.addColumn('Products', 'subcategoryId', {
+      type: Sequelize.INTEGER,
+      references: {model: 'Subcategories'}
+    });
 
   },
 
   async down(queryInterface, Sequelize) {
 
     await queryInterface.dropTable('Subcategories');
-    await queryInterface.renameColumn('Products', 'subcategoryId', 'categoryId');
+    await queryInterface.removeColumn('Products', 'subcategoryId');
+    await queryInterface.addColumn('Products', 'categoryId', {
+      type: Sequelize.INTEGER,
+      references: {model: 'Categories'}
+    });
     
   }
 
