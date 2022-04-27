@@ -8,13 +8,6 @@ export default class OrderProduct extends Model {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      userId: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-        references: {model: 'Users'},
-        onDelete: 'cascade',
-      },
       orderId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -24,6 +17,7 @@ export default class OrderProduct extends Model {
       },
       productId: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         allowNull: false,
         references: {model: 'Products'},
         onDelete: 'cascade',
@@ -33,7 +27,6 @@ export default class OrderProduct extends Model {
 
   static associate(models) {
     this.belongsTo(models.Order, {onDelete: 'cascade', foreignKey: 'orderId'});
-    this.belongsTo(models.User, {onDelete: 'cascade', foreignKey: 'userId'});
     this.belongsTo(models.Product, {onDelete: 'cascade', foreignKey: 'productId'});
   }
   

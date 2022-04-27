@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv/config';
 
-// import models from './models';
+import models from './models';
 import { userApiRouter } from './routes/userApiRouter.js';
 import { productApiRouter } from './routes/productApiRouter.js';
 import { categoryApiRouter } from './routes/categoryApiRouter.js';
@@ -22,7 +22,7 @@ app.use('/api/category', categoryApiRouter);
 
 
 
-// models.User.sync()
+// models.OrderProduct.sync()
 //    .then(() => {
 //       app.listen(PORT, () => console.log(`Server has been started on PORT ${PORT}...`));
 //    })

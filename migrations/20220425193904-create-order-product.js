@@ -15,13 +15,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
-      userId: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-        references: {model: 'Users'},
-        onDelete: 'cascade',
-      },
       orderId: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -31,6 +24,7 @@ module.exports = {
       },
       productId: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
         allowNull: false,
         references: {model: 'Products'},
         onDelete: 'cascade',

@@ -31,6 +31,8 @@ export default class Product extends Model {
   }
 
   static associate(models) {
+    // this.hasMany(models.OrderProduct, {onDelete: 'cascade', foreignKey: 'productId'});
+    this.belongsToMany(models.Order, {through: models.OrderProduct, foreignKey: 'productId'});
     this.hasMany(models.OrderProduct, {onDelete: 'cascade', foreignKey: 'productId'});
     this.belongsTo(models.Category, {foreignKey: 'categoryId'});
   }

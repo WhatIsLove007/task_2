@@ -28,8 +28,7 @@ export default class User extends Model {
   }
 
   static associate(models) {
-    this.hasOne(models.Order, {onDelete: 'cascade', foreignKey: 'userId'});
-    this.hasMany(models.OrderProduct, {onDelete: 'cascade', foreignKey: 'userId'});
+    this.hasMany(models.Order, {onDelete: 'cascade', foreignKey: 'userId'});
   }
   
 };
