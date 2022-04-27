@@ -23,7 +23,7 @@ export default class Product extends Model {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
       },
-      categoryId: {
+      subcategoryId: {
         type: DataTypes.INTEGER,
         references: {model: 'Categories'}
       },
@@ -33,7 +33,7 @@ export default class Product extends Model {
   static associate(models) {
     this.belongsToMany(models.Order, {through: models.OrderProduct, foreignKey: 'productId'});
     this.hasMany(models.OrderProduct, {onDelete: 'cascade', foreignKey: 'productId'});
-    this.belongsTo(models.Category, {foreignKey: 'categoryId'});
+    this.belongsTo(models.Category, {foreignKey: 'subcategoryId'});
   }
   
 };

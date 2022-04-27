@@ -30,6 +30,7 @@ export default class User extends Model {
 
   static associate(models) {
     this.hasMany(models.Order, {onDelete: 'cascade', foreignKey: 'userId'});
+    this.hasOne(models.Balance, {onDelete: 'cascade', foreignKey: 'userId'});
   }
   
 };

@@ -1,14 +1,18 @@
 import { Model } from 'sequelize';
 
-export default class Category extends Model {
+export default class Subcategory extends Model {
   
   static init = (sequelize, DataTypes) => {
     return super.init({
       id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
         allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+      categoryId: {
+        type: DataTypes.INTEGER,
+        references: {model: 'Categories'},
       },
       name: {
         type: DataTypes.STRING,
@@ -19,7 +23,8 @@ export default class Category extends Model {
   }
 
   static associate(models) {
-    this.hasMany(models.Subcategory, {foreignKey: 'categoryId'});
+    this.hasMany(models.Product, {foreignKey: 'subcategoryId'});
+    this.belongsTo(models.Category, {foreignKey: 'categoryId'})
   }
   
 };
