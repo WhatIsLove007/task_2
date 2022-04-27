@@ -15,15 +15,16 @@ export default class User extends Model {
         allowNull: false,
         unique: true,
      },
-     password: {
+     passwordHash: {
         type: DataTypes.STRING,
         allowNull: false,
      },
-     account: {
-        type: DataTypes.DECIMAL(11, 2),
-        allowNull: false,
-        defaultValue: 0,
-      },
+     name: {
+      type: DataTypes.STRING,
+     },
+     phone: {
+      type: DataTypes.STRING,
+     },
     }, {sequelize})
   }
 

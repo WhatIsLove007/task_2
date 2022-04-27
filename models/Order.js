@@ -10,6 +10,10 @@ export default class Order extends Model {
         autoIncrement: true,
         allowNull: false,
       },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -20,7 +24,6 @@ export default class Order extends Model {
   }
 
   static associate(models) {
-    // this.hasMany(models.OrderProduct, {onDelete: 'cascade', foreignKey: 'orderId'});
     this.belongsToMany(models.Product, {through: models.OrderProduct, foreignKey: 'orderId'});
     this.hasMany(models.OrderProduct, {onDelete: 'cascade', foreignKey: 'orderId'});
     this.belongsTo(models.User, {onDelete: 'cascade', foreignKey: 'userId'});
