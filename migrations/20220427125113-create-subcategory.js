@@ -40,12 +40,12 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
 
-    await queryInterface.dropTable('Subcategories');
     await queryInterface.removeColumn('Products', 'subcategoryId');
     await queryInterface.addColumn('Products', 'categoryId', {
       type: Sequelize.INTEGER,
       references: {model: 'Categories'}
     });
+    await queryInterface.dropTable('Subcategories');
     
   }
 

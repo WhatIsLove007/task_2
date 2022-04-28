@@ -8,10 +8,12 @@ import * as errorHandler from '../utils/errorHandler.js';
 
 export const createUser = async (request, response) => {
    
-   const {email, password} = request.body;
+   const {email, password, name, phone} = request.body;
+
+   const transaction = await sequelize.transaction();
 
    try {
-      fieldsValidation.validateFields([email, password]);
+      fieldsValidation.validateFields([email, password, name, phone]);
 
       if (!entryDataValidation.validateEmail(email)) {
          return response.status(400).send({message: 'Incorrect email'});
@@ -21,14 +23,24 @@ export const createUser = async (request, response) => {
          return response.status(400).send({message: 'Incorrect password'});
       }
    
-      const user = await models.User.findOne({where: {email}});
-      if (user) return response.status(401).send({message: 'Email already exist'});
+      const existingEmail = await models.User.findOne({where: {email}});
+      if (existingEmail) return response.status(401).send({message: 'Email already exist'});
 
-      await models.User.create({email, password: await passwordHashing.hash(password)});
+      const user = await models.User.create({
+         email, 
+         name, 
+         phone, 
+         passwordHash: await passwordHashing.hash(password)
+      }, {transaction});
+
+      await user.createBalance({}, {transaction});
+
+      await transaction.commit();
 
       response.sendStatus(200);
 
    } catch (error) {
+      transaction.rollback();
       errorHandler.handle(error, response);
    }
 }
@@ -43,25 +55,23 @@ export const balance = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId, amountOfMoney, action]);
 
-      const user = await models.User.findByPk(userId);
-      if (!user) return response.status(404).send({message: 'User not found'});
-
+      const balance = await models.Balance.findByPk(userId);
+      if (!balance) return response.status(404).send({message: 'Balance not found'});
 
       if (action === 'replenishment') {
-         const resultedBalance = parseFloat(user.account) + amountOfMoney;
-         await user.update({account: resultedBalance});
+         const resultedBalance = parseFloat(balance.account) + amountOfMoney;
+         await balance.update({account: resultedBalance});
 
       }  else if (action === 'billing') {
-         const resultedBalance = user.account - amountOfMoney;
+         const resultedBalance = balance.account - amountOfMoney;
          if (resultedBalance < 0) return response.status(403).send({message: 'Payment prohibited'});
 
-         await user.update({account: resultedBalance});
+         await balance.update({account: resultedBalance});
 
       }  else {
          return response.status(400).send({message: 'Incorrect action'});
 
       }
-
 
       return response.sendStatus(200);
 
@@ -88,7 +98,7 @@ export const addProductToOrder = async (request, response) => {
       const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await user.getOrders();
+      const order = await user.getOrders({where: {status: 'Shopping cart'}});
 
       if (order.length) {
 
@@ -148,15 +158,15 @@ export const removeProductFromOrder = async (request, response) => {
       const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await user.getOrders({where: {id: orderId}});
+      const order = await user.getOrders({where: {id: orderId, status: 'Shopping cart'}});
       if (!order.length) return response.status(404).send({message: 'Order does not exist'});
 
-      const orderProduct = await models.OrderProduct.findOne({where: {orderId, productId}});
+      const orderProduct = await models.OrderProduct.findOne({where: {orderId: order[0].id, productId}});
       if (!orderProduct) return response.status(404).send({message: 'Product does not exist in order'});
 
       await orderProduct.destroy();
 
-      response.sendStatus(200);
+      return response.sendStatus(200);
 
    } catch (error) {
       errorHandler.handle(error, response);
@@ -175,7 +185,7 @@ export const removeOrder = async (request, response) => {
       const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await user.getOrders({where: {id: orderId}});
+      const order = await user.getOrders({where: {id: orderId, status: 'Shopping cart'}});
       if (!order.length) return response.status(404).send({message: 'Order does not exist'});
 
       await order[0].destroy();
@@ -202,7 +212,7 @@ export const completeOrder = async (request, response) => {
       const user = await models.User.findByPk(userId);
       if (!user) return response.status(404).send({message: 'User not found'});
 
-      const order = await user.getOrders({where: {id: orderId}});
+      const order = await user.getOrders({where: {id: orderId, status: 'Shopping cart'}});
       if (!order.length) return response.status(404).send({message: 'Order not found'});
 
       const orderProducts = await order[0].getOrderProducts();
@@ -252,7 +262,8 @@ export const getUser = async (request, response) => {
       return response.send({
          id: user.id,
          email: user.email,
-         account: user.account,
+         name: user.name,
+         phone: user.phone,
          createdAt: user.createdAt,
       });
 
@@ -260,6 +271,7 @@ export const getUser = async (request, response) => {
       errorHandler.handle(error, response);      
    }
 }
+
 
 export const deleteUser = async (request, response) => {
 

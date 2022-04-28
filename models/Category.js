@@ -15,6 +15,10 @@ export default class Category extends Model {
         allowNull: false,
         unique: true,
       },
+      parentId: {
+        type: DataTypes.INTEGER,
+        references: {model: 'Categories'},
+      }
     }, {sequelize})
   }
 

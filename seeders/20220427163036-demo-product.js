@@ -9,7 +9,7 @@ module.exports = {
         price: 4500000,
         createdAt: new Date(),
         updatedAt: new Date(),
-        subcategoryId: await queryInterface.rawSelect('Subcategories', {where: {name: 'Sports car'}}, ['id']),
+        categoryId: await queryInterface.rawSelect('Categories', {where: {name: 'Sports car'}}, ['id']),
       },
       {
         name: 'Tesla Roadster',
@@ -17,7 +17,7 @@ module.exports = {
         price: 200000,
         createdAt: new Date(),
         updatedAt: new Date(),
-        subcategoryId: await queryInterface.rawSelect('Subcategories', {where: {name: 'Sports car'}}, ['id']),
+        categoryId: await queryInterface.rawSelect('Categories', {where: {name: 'Sports car'}}, ['id']),
       },
       {
         name: 'Ferrari F40',
@@ -25,7 +25,7 @@ module.exports = {
         price: 1625000,
         createdAt: new Date(),
         updatedAt: new Date(),
-        subcategoryId: await queryInterface.rawSelect('Subcategories', {where: {name: 'Sports car'}}, ['id']),
+        categoryId: await queryInterface.rawSelect('Categories', {where: {name: 'Sports car'}}, ['id']),
       },
       {
         name: 'Lamborghini Urus',
@@ -33,7 +33,7 @@ module.exports = {
         price: 218100,
         createdAt: new Date(),
         updatedAt: new Date(),
-        subcategoryId: await queryInterface.rawSelect('Subcategories', {where: {name: 'SUV'}}, ['id']),
+        categoryId: await queryInterface.rawSelect('Categories', {where: {name: 'SUV'}}, ['id']),
       },
       {
         name: 'McLaren 720S',
@@ -41,7 +41,7 @@ module.exports = {
         price: 301500,
         createdAt: new Date(),
         updatedAt: new Date(),
-        subcategoryId: await queryInterface.rawSelect('Subcategories', {where: {name: 'Sports car'}}, ['id']),
+        categoryId: await queryInterface.rawSelect('Categories', {where: {name: 'Sports car'}}, ['id']),
       },
       {
         name: 'Aston Martin Vantage Coupe Trims',
@@ -49,7 +49,7 @@ module.exports = {
         price: 146980,
         createdAt: new Date(),
         updatedAt: new Date(),
-        subcategoryId: await queryInterface.rawSelect('Subcategories', {where: {name: 'Sports car'}}, ['id']),
+        categoryId: await queryInterface.rawSelect('Categories', {where: {name: 'Sports car'}}, ['id']),
       },
       {
         name: 'Bentley Continental GT',
@@ -57,7 +57,7 @@ module.exports = {
         price: 222700,
         createdAt: new Date(),
         updatedAt: new Date(),
-        subcategoryId: await queryInterface.rawSelect('Subcategories', {where: {name: 'Grand tourer'}}, ['id']),
+        categoryId: await queryInterface.rawSelect('Categories', {where: {name: 'Grand tourer'}}, ['id']),
       },
       {
         name: 'Rolls-Royce Ghost',
@@ -65,7 +65,7 @@ module.exports = {
         price: 311900,
         createdAt: new Date(),
         updatedAt: new Date(),
-        subcategoryId: await queryInterface.rawSelect('Subcategories', {where: {name: 'Full-size luxury car'}}, ['id']),
+        categoryId: await queryInterface.rawSelect('Categories', {where: {name: 'Full-size luxury car'}}, ['id']),
       },
     ], {});
   },

@@ -36,7 +36,8 @@ export const remove = async (request, response) => {
 
       const existingProduct = await models.Product.destroy({where: {id}});
       if (!existingProduct) return response.status(404).send({message: 'Product does not exist'});
-      response.sendStatus(200);
+      
+      return response.sendStatus(200);
       
    } catch (error) {
       errorHandler.handle(error, response);
@@ -56,7 +57,7 @@ export const get = async (request, response) => {
       const product = await models.Product.findByPk(id);
       if (!product) return response.status(404).send({message: 'Product does not exist'});
       
-      response.send(product);
+      return response.send(product);
       
    } catch (error) {
       errorHandler.handle(error, response);
@@ -71,7 +72,7 @@ export const getAll = async (request, response) => {
       const products = await models.Product.findAll({raw: true});
       if (!products.length) return response.status(404).send({message: 'No products'});
 
-      response.send(products);
+      return response.send(products);
 
    } catch (error) {
       errorHandler.handle(error, response);
