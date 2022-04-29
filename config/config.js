@@ -1,7 +1,7 @@
 module.exports = {
   "development": {
     "username": "root",
-    "password": null,
+    "password": process.env.MYSQL_PASSWORD,
     "database": "car_store_db",
     "host": "127.0.0.1",
     "port": "3307",
@@ -9,7 +9,7 @@ module.exports = {
   },
   "test": {
     "username": "root",
-    "password": null,
+    "password": process.env.MYSQL_PASSWORD,
     "database": "car_store_db",
     "host": "127.0.0.1",
     "port": "3307",
@@ -17,7 +17,7 @@ module.exports = {
   },
   "production": {
     "username": "root",
-    "password": null,
+    "password": process.env.MYSQL_PASSWORD,
     "database": "car_store_db",
     "host": "127.0.0.1",
     "port": "3307",

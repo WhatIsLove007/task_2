@@ -14,16 +14,12 @@ export const add = async (request, response) => {
       const existingCategory = await models.Category.findOne({where: {name}});
       if (existingCategory) return response.status(409).send({message: 'Category already exists'});
 
-      if (parentId === 'null') {
-         await models.Category.create({name});
-
-      }  else {
+      if (parentId) {
          const parentCategory = await models.Category.findOne({where: {id: parentId}});
          if (!parentCategory) return response.status(404).send({message: 'Parent category not found'});
-   
-         await models.Category.create({name, parentId});
-
       }
+      
+      await models.Category.create({ name, ...(parentId && {parentId}) });
       
       return response.sendStatus(200);
       
@@ -77,16 +73,19 @@ export const get = async (request, response) => {
 
 export const update = async (request, response) => {
 
-   const {id, newName} = request.body;
+   const {id, name, parentId} = request.body;
 
    try {
 
-      fieldsValidation.validateFields([id, newName]);
+      fieldsValidation.validateFields([id, name, parentId]);
 
       const category = await models.Category.findByPk(id);
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
-      await category.update({name: newName});
+      const parentCategory = await models.Category.findByPk(parentId);
+      if (!parentCategory) return response.status(404).send({message: 'Parent category does not exist'});
+
+      await category.update({name, parentId});
 
       return response.sendStatus(200);
 
