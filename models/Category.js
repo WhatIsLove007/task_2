@@ -23,7 +23,7 @@ export default class Category extends Model {
   }
 
   static associate(models) {
-    this.hasMany(models.Subcategory, {foreignKey: 'categoryId'});
+    this.hasMany(models.Product, {foreignKey: 'categoryId'});
   }
   
 };

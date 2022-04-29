@@ -18,6 +18,12 @@ export default class Balance extends Model {
       },
       discount: {
         type: DataTypes.INTEGER.UNSIGNED,
+        validate: {
+          min: 0,
+          max: 100,
+        },
+        allowNull: false,
+        defaultValue: 0,
       },
     }, {sequelize})
   }

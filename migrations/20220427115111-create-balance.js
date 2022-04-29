@@ -16,6 +16,12 @@ module.exports = {
       },
       discount: {
         type: Sequelize.INTEGER.UNSIGNED,
+        validate: {
+          min: 0,
+          max: 100,
+        },
+        allowNull: false,
+        defaultValue: 0,
       },
       createdAt: {
         allowNull: false,

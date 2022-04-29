@@ -11,8 +11,8 @@ export default class Order extends Model {
         allowNull: false,
       },
       status: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['SHOPPING CART', 'IN PROCESSING', 'CONFIRMED', 'BEING DELIVERED', 'DELIVERED', 'RECEIVED', 'FAILED'],  
       },
       userId: {
         type: DataTypes.INTEGER,

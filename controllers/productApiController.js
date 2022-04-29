@@ -18,7 +18,7 @@ export const add = async (request, response) => {
 
       await category.createProduct({name, description, price});
 
-      response.sendStatus(200);
+      return response.sendStatus(200);
       
    } catch (error) {
       errorHandler.handle(error, response);

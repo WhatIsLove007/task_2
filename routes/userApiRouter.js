@@ -20,3 +20,5 @@ userApiRouter.delete('/order/product', userApiController.removeProductFromOrder)
 userApiRouter.delete('/order', userApiController.removeOrder);
 
 userApiRouter.post('/order', userApiController.completeOrder);
+
+userApiRouter.post('/discount', userApiController.setDiscountForUser);

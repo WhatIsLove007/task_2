@@ -2,19 +2,30 @@ import models from '../models';
 import * as fieldsValidation from '../utils/fieldsValidation.js';
 import * as errorHandler from '../utils/errorHandler.js';
 
+
 export const add = async (request, response) => {
 
-   const name = request.body.name;
+   const { name, parentId } = request.body;
 
    try {
 
-      fieldsValidation.validateFields([name]);
+      fieldsValidation.validateFields([name, parentId]);
 
       const existingCategory = await models.Category.findOne({where: {name}});
       if (existingCategory) return response.status(409).send({message: 'Category already exists'});
 
-      await models.Category.create({name});
-      response.sendStatus(200);
+      if (parentId === 'null') {
+         await models.Category.create({name});
+
+      }  else {
+         const parentCategory = await models.Category.findOne({where: {id: parentId}});
+         if (!parentCategory) return response.status(404).send({message: 'Parent category not found'});
+   
+         await models.Category.create({name, parentId});
+
+      }
+      
+      return response.sendStatus(200);
       
    } catch (error) {
       errorHandler.handle(error, response);
@@ -91,7 +102,7 @@ export const getAll = async (request, response) => {
       const categories = await models.Category.findAll();
       if (!categories.length) return response.status(404).send({message: 'No categories'});
 
-      response.send(categories);
+      return response.send(categories);
 
    } catch (error) {
       errorHandler.handle(error, response);
@@ -112,7 +123,7 @@ export const getProductsInCategory = async (request, response) => {
       const products = await category.getProducts();
       if (!products.length) return response.status(404).send({message: 'No products in category'});
       
-      response.send(products);
+      return response.send(products);
 
 
    } catch (error) {
