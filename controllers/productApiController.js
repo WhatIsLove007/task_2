@@ -54,7 +54,10 @@ export const get = async (request, response) => {
    try {
       fieldsValidation.validateFields([id]);
 
-      const product = await models.Product.findByPk(id);
+      const product = await models.Product.findByPk(id, {
+         include: {model: models.Category, attributes: ['id', 'name']},
+      });
+
       if (!product) return response.status(404).send({message: 'Product does not exist'});
       
       return response.send(product);
@@ -69,7 +72,10 @@ export const get = async (request, response) => {
 export const getAll = async (request, response) => {
    
    try {
-      const products = await models.Product.findAll({raw: true});
+      const products = await models.Product.findAll({
+         include: {model: models.Category, attributes: ['id', 'name']},
+      });
+      
       if (!products.length) return response.status(404).send({message: 'No products'});
 
       return response.send(products);

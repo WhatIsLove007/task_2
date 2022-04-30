@@ -13,6 +13,9 @@ export const handle = (error, response) => {
       case 'No data in request body':
          return response.status(400).send({message: error.message});
          break;
+      case 'Incorrect currency':
+         return response.status(400).send({message: error.message});
+         break;
       default:
          console.log(error);
          return response.status(500).send({message: 'Server error'});

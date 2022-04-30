@@ -4,6 +4,7 @@ import * as entryDataValidation from '../utils/entryDataValidation.js';
 import * as passwordHashing from '../utils/passwordHashing.js';
 import * as fieldsValidation from '../utils/fieldsValidation.js';
 import * as errorHandler from '../utils/errorHandler.js';
+import * as currencyConverter from '../utils/currencyConverter.js';
 import { ORDER_STATUSES } from '../config/const.js';
 
 
@@ -49,11 +50,16 @@ export const createUser = async (request, response) => {
 
 export const balance = async (request, response) => {
 
-   const {userId, action} = request.body;
-   const amountOfMoney = request.body.amountOfMoney;
+   const { userId, currency, action } = request.body;
+   let amountOfMoney = request.body.amountOfMoney;
 
    try {
-      fieldsValidation.validateFields([userId, amountOfMoney, action]);
+
+      fieldsValidation.validateFields([userId, amountOfMoney, amountOfMoney, action]);
+
+      if (currency !== 'USD'){
+         amountOfMoney = await currencyConverter.convertToUsd(currency, amountOfMoney);
+      }
 
       const balance = await models.Balance.findByPk(userId);
       if (!balance) return response.status(404).send({message: 'Balance not found'});

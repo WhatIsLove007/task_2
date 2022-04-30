@@ -12,5 +12,3 @@ categoryApiRouter.get('/', categoryApiController.get);
 categoryApiRouter.put('/', categoryApiController.update);
 
 categoryApiRouter.get('/all', categoryApiController.getAll);
-
-categoryApiRouter.get('/products', categoryApiController.getProductsInCategory);

@@ -59,8 +59,13 @@ export const get = async (request, response) => {
 
       fieldsValidation.validateFields([id]);
 
-      const category = await models.Category.findByPk(id);
+      const category = await models.Category.findOne({where: {id}, include: [
+         {model: models.Category},
+         {model: models.Product}, 
+      ]});
+
       if (!category) return response.status(404).send({message: 'Category does not exist'});
+
 
       return response.send(category);
 
@@ -98,7 +103,7 @@ export const update = async (request, response) => {
 
 export const getAll = async (request, response) => {
    try {
-      const categories = await models.Category.findAll();
+      const categories = await models.Category.findAll({include: models.Category});
       if (!categories.length) return response.status(404).send({message: 'No categories'});
 
       return response.send(categories);
@@ -106,27 +111,4 @@ export const getAll = async (request, response) => {
    } catch (error) {
       errorHandler.handle(error, response);
    }
-}
-
-
-export const getProductsInCategory = async (request, response) => {
-   
-   const categoryId = request.query.categoryId;
-
-   try {
-      fieldsValidation.validateFields([categoryId]);
-
-      const category = await models.Category.findByPk(categoryId);
-      if (!category) return response.status(404).send({message: 'Category does not exist'});
-
-      const products = await category.getProducts();
-      if (!products.length) return response.status(404).send({message: 'No products in category'});
-      
-      return response.send(products);
-
-
-   } catch (error) {
-      errorHandler.handle(error, response);
-   }
-
 }
