@@ -7,6 +7,8 @@ userApiRouter.post('/', userApiController.createUser);
 
 userApiRouter.get('/', userApiController.getUser);
 
+userApiRouter.get('/all', userApiController.getUsers);
+
 userApiRouter.delete('/', userApiController.deleteUser);
 
 userApiRouter.put('/', userApiController.updateUser);

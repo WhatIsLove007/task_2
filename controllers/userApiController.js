@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { sequelize } from '../models/index.js';
 import models from '../models';
 import * as entryDataValidation from '../utils/entryDataValidation.js';
@@ -368,5 +369,11 @@ export const setDiscountForUser = async (request, response) => {
    } catch (error) {
       errorHandler.handle(error, response);
    }
+
+}
+
+
+export const getUsers = async (request, response) => {
+
 
 }

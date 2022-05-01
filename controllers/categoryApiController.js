@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import models from '../models';
 import * as fieldsValidation from '../utils/fieldsValidation.js';
 import * as errorHandler from '../utils/errorHandler.js';
@@ -102,8 +103,23 @@ export const update = async (request, response) => {
 
 
 export const getAll = async (request, response) => {
+
+   const name = request.query.name;
+   const limit = parseInt(request.query.limit);
+   const offset = parseInt(request.query.offset);
+
    try {
-      const categories = await models.Category.findAll({include: models.Category});
+      fieldsValidation.validateFields([limit, offset]);
+
+      const categories = await models.Category.findAll({
+         include: models.Category, 
+         where: {
+            name: {[Op.like]: `%${name}%`},
+         },
+         limit, 
+         offset,
+      });
+      
       if (!categories.length) return response.status(404).send({message: 'No categories'});
 
       return response.send(categories);
