@@ -102,46 +102,46 @@ export const addProductToOrder = async (request, response) => {
       const product = await models.Product.findByPk(productId);
       if (!product) return response.status(404).send({message: 'Product does not exist'});
       
-      const user = await models.User.findByPk(userId);
+      const user = await models.User.findByPk(userId, {
+         include: {
+            model: models.Order,
+            where: {status: ORDER_STATUSES.SHOPPING_CART},
+            required: false,
+            include: {
+               model: models.OrderProduct,
+               required: false,
+               where: {productId}
+            }
+         }
+      });
+
       if (!user) return response.status(404).send({message: 'User does not exist'});
 
-      const order = await user.getOrders({where: {status: ORDER_STATUSES.SHOPPING_CART}});
-
-      if (order.length) {
-
-         const orderProduct = await models.OrderProduct.findOne({
-            where: {
-               orderId: order[0].id,
-               productId,
-            }
-         });
-   
-         if (orderProduct) {
-
-            await orderProduct.update({quantity: orderProduct.quantity + productQuantity});
-
-         }  else {
-
-            await models.OrderProduct.create({
-               quantity: productQuantity,
-               orderId: order[0].id,
-               productId, 
-            }, {transaction});
-
-         }
-   
-      } else {
+      if (!user.Orders.length) {
          const order = await user.createOrder({status: ORDER_STATUSES.SHOPPING_CART}, {transaction});
-         await models.OrderProduct.create({
+         await order.createOrderProduct({
             productId,
-            orderId: order.id,
             quantity: productQuantity,
          }, {transaction});
+
+      }  else {
+
+         if (user.Orders[0].OrderProducts[0]) {
+            await user.Orders[0].OrderProducts[0].update({
+               quantity: user.Orders[0].OrderProducts[0].quantity + productQuantity,
+            });
+
+         }  else {
+            await user.Orders[0].createOrderProduct({
+               quantity: productQuantity,
+               productId, 
+            }, {transaction});
+            
+         }
       }
    
       await transaction.commit();
       return response.sendStatus(200);
-
 
    } catch (error) {
       await transaction.rollback();
@@ -155,23 +155,33 @@ export const removeProductFromOrder = async (request, response) => {
 
    const {userId, productId, orderId} = request.query;
 
-   
    try {
       fieldsValidation.validateFields([userId, productId, orderId]);
 
       const product = await models.Product.findByPk(productId);
       if (!product) return response.status(404).send({message: 'Product does not exist'});
 
-      const user = await models.User.findByPk(userId);
+      const user = await models.User.findByPk(userId, {
+         include: {
+            model: models.Order,
+            where: {id: orderId},
+            required: false,
+            include: {
+               model: models.OrderProduct, 
+               where: {productId}, 
+               required: false,
+            },
+         },
+         attributes: ['id', 'email', 'name', 'phone'],
+      });
+
       if (!user) return response.status(404).send({message: 'User does not exist'});
+      if (!user.Orders.length) return response.status(404).send({message: 'Order does not exist'});
+      if (!user.Orders[0].OrderProducts[0]) {
+         return response.status(404).send({message: 'Product does not exist in order'});
+      }
 
-      const order = await user.getOrders({where: {id: orderId, status: ORDER_STATUSES.SHOPPING_CART}});
-      if (!order.length) return response.status(404).send({message: 'Order does not exist'});
-
-      const orderProduct = await models.OrderProduct.findOne({where: {orderId: order[0].id, productId}});
-      if (!orderProduct) return response.status(404).send({message: 'Product does not exist in order'});
-
-      await orderProduct.destroy();
+      await user.Orders[0].OrderProducts[0].destroy();
 
       return response.sendStatus(200);
 
@@ -213,25 +223,36 @@ export const completeOrder = async (request, response) => {
    try {
       fieldsValidation.validateFields([userId, orderId]);
 
-      const user = await models.User.findByPk(userId);
+      const user = await models.User.findByPk(userId, {
+         include: {
+            model: models.Order,
+            where: {id: orderId, status: ORDER_STATUSES.SHOPPING_CART},
+            required: false,
+            include: {
+               model: models.OrderProduct,
+               required: false,
+            },
+         }
+      });
+
       if (!user) return response.status(404).send({message: 'User not found'});
 
-      const order = await user.getOrders({where: {id: orderId, status: ORDER_STATUSES.SHOPPING_CART}});
-      if (!order.length) return response.status(404).send({message: 'Order not found'});
+      if (!user.Orders.length) return response.status(404).send({message: 'Order not found'});
 
-      const orderProducts = await order[0].getOrderProducts();
-      if (!orderProducts.length) return response.status(404).send({message: 'No products in order'});
+      if (!user.Orders[0].OrderProducts.length) return response.status(404).send({message: 'No products in order'});
 
       let purchasePrice = 0;
 
-      for (let i = 0; i < orderProducts.length; i++) {
+      for (let i = 0; i < user.Orders[0].OrderProducts.length; i++) {
 
-         const product = await orderProducts[i].getProduct();
+         const product = await user.Orders[0].OrderProducts[i].getProduct();
 
          if (!product) {
-            return response.status(404).send({message: `Product ID ${orderProducts[i].productId} does not exist`});
+            return response.status(404).send({
+               message: `Product ID ${user.Orders[0].OrderProducts[i].productId} does not exist`
+            });
          }
-         purchasePrice += product.price * orderProducts[i].quantity;
+         purchasePrice += product.price * user.Orders[0].OrderProducts[i].quantity;
       }
 
       const balance = await user.getBalance();
@@ -248,7 +269,7 @@ export const completeOrder = async (request, response) => {
       if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'});
 
       await balance.update({account: resultedAccount}, {transaction});
-      await order[0].destroy({}, {transaction});
+      await user.Orders[0].update({status: ORDER_STATUSES.CONFIRMED}, {transaction});
 
       await transaction.commit();
       return response.sendStatus(200);
