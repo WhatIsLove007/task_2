@@ -18,13 +18,14 @@ export default class Category extends Model {
       parentId: {
         type: DataTypes.INTEGER,
         references: {model: 'Categories'},
+        onDelete: 'CASCADE',
       }
     }, {sequelize})
   }
 
   static associate(models) {
     this.hasMany(models.Product, {foreignKey: 'categoryId'});
-    this.hasMany(models.Category, {foreignKey: 'parentId'});
+    this.hasMany(models.Category, {foreignKey: 'parentId', onDelete: 'CASCADE'});
   }
   
 };

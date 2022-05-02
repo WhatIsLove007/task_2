@@ -12,14 +12,17 @@ export default class Order extends Model {
       },
       status: {
         type: DataTypes.ENUM,
-        values: ['SHOPPING CART', 'IN PROCESSING', 'CONFIRMED', 'BEING DELIVERED', 'DELIVERED', 'RECEIVED', 'FAILED'],  
+        values: ['SHOPPING CART', 'PAID', 'BEING DELIVERED', 'DELIVERED', 'RECEIVED'],  
       },
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {model: 'Users'},
         onDelete: 'cascade',
-      }
+      },
+      orderPrice: {
+        type: DataTypes.DECIMAL(11, 2),
+      },
     }, {sequelize})
   }
 

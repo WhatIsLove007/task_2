@@ -43,7 +43,7 @@ export const remove = async (request, response) => {
       if (!category) return response.status(404).send({message: 'Category does not exist'});
 
       await category.destroy();
-      response.sendStatus(200);
+      return response.sendStatus(200);
       
    } catch (error) {
       errorHandler.handle(error, response);

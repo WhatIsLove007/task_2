@@ -270,7 +270,7 @@ export const completeOrder = async (request, response) => {
       if (resultedAccount < 0) return response.status(403).send({message: 'Payment prohibited'});
 
       await balance.update({account: resultedAccount}, {transaction});
-      await user.Orders[0].update({status: ORDER_STATUSES.CONFIRMED}, {transaction});
+      await user.Orders[0].update({status: ORDER_STATUSES.PAID, orderPrice: purchasePrice}, {transaction});
 
       await transaction.commit();
       return response.sendStatus(200);
@@ -375,5 +375,48 @@ export const setDiscountForUser = async (request, response) => {
 
 export const getUsers = async (request, response) => {
 
+   const {email, name, status, orderPriceIsMoreThan, balance, discount} = request.query;
+
+   try {
+
+      const users = await models.User.findAll({
+         where: {
+            [Op.and]: [
+               {email: {[Op.like]: `%${email}%`}},
+               {name: {[Op.like]: `%${name}%`}},
+            ],
+         },
+         include: [{
+            model: models.Balance,
+            attributes: ['userId', 'account', 'discount'],
+            where: {
+               [Op.and]: [
+                  {account: {[Op.gte]: balance[0]}},
+                  {account: {[Op.lte]: balance[1]}},
+                  {discount: {[Op.gte]: discount[0]}},
+                  {discount: {[Op.lte]: discount[1]}},
+               ]
+            }
+         }, {
+            model: models.Order,
+            ...(status? {required: true, where: {status}} : {}),
+            ...(orderPriceIsMoreThan? {
+               required: true,
+               where: {
+                  orderPrice: {
+                     [Op.gte]: orderPriceIsMoreThan,
+                  }
+               }
+            } : {})
+         }],
+      });
+
+      if (!users.length) return response.status(404).send({message: 'Users not found'});
+
+      return response.send(users);
+
+   } catch (error) {
+      errorHandler.handle(error, response);
+   }
 
 }

@@ -16,6 +16,7 @@ module.exports = {
       await queryInterface.addColumn('Categories', 'parentId', {
          type: Sequelize.INTEGER,
          references: {model: 'Categories'},
+         onDelete: 'CASCADE',
       });
 
   

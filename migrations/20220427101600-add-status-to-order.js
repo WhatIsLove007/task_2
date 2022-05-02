@@ -5,7 +5,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.addColumn('Orders', 'status', {
       type: Sequelize.ENUM,
-      values: ['SHOPPING CART', 'IN PROCESSING', 'CONFIRMED', 'BEING DELIVERED', 'DELIVERED', 'RECEIVED', 'FAILED'],
+      values: ['SHOPPING CART', 'PAID', 'BEING DELIVERED', 'DELIVERED', 'RECEIVED'],
     });
   },
 
